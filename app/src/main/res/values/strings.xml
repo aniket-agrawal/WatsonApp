@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">WatsonApp</string>
+
+
+
+    <string-array name="typeofgender">
+        <item>Gender</item>
+        <item>Male</item>
+        <item>Female</item>
+        <item>Others</item>
+    </string-array>
 </resources>
+
