@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "790412370811",
+    "firebase_url": "https://watson-27c5f.firebaseio.com",
+    "project_id": "watson-27c5f",
+    "storage_bucket": "watson-27c5f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790412370811:android:16314db36db81b3632d3de",
+        "android_client_info": {
+          "package_name": "com.example.watsonapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "790412370811-2ofdemctkpv9pmhj183bp060fl1ctacr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.watsonapp",
+            "certificate_hash": "80e3c3e7462ee904e9d9ed5efc4c10fa9e805d39"
+          }
+        },
+        {
+          "client_id": "790412370811-v0nh1t3h8tgju6vq9mdk0aes059cdmv5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr53-d4kwBcXTZy-i6RGXqiIaI0rZ_JRA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "790412370811-v0nh1t3h8tgju6vq9mdk0aes059cdmv5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
