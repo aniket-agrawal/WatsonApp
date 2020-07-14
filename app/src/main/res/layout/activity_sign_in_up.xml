@@ -151,13 +151,14 @@
                 android:drawableStart="@drawable/googlenew"
                 />
 
-            <com.facebook.login.widget.LoginButton
+            <Button
                 android:id="@+id/facebook_login_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@+id/google_login_button"
                 android:text="Login Using Facebook"
+                android:onClick="FacebookSignIn"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="19dp"
                 android:layout_marginRight="19dp"
