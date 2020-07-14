@@ -166,11 +166,12 @@
                 android:drawableStart="@drawable/googlenew"
                 />
 
-            <com.facebook.login.widget.LoginButton
+            <Button
                 android:id="@+id/facebook_signup_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:onClick="FacebookSignUp"
                 android:layout_below="@+id/google_signup_button"
                 android:text="SignUp Using Facebook"
                 android:layout_marginTop="20dp"

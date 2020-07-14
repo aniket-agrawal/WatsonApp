@@ -5,10 +5,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -18,6 +26,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -27,6 +36,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 public class SignUpActivity extends AppCompatActivity {
 
     EditText email,password,confirmPassword;
@@ -34,6 +46,8 @@ public class SignUpActivity extends AppCompatActivity {
     String mail,pass,confirmPass;
     private final static int RC_SIGN_IN = 123;
     GoogleSignInClient mGoogleSignInClient;
+    CallbackManager callbackManager;
+    LoginManager loginManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +58,23 @@ public class SignUpActivity extends AppCompatActivity {
         confirmPassword = (EditText)findViewById(R.id.confirm_password_signup);
         mAuth = FirebaseAuth.getInstance();
         createRequest();
+        callbackManager = CallbackManager.Factory.create();
+        loginManager = LoginManager.getInstance();
+        loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException exception){
+            }
+        });
     }
 
     public void signIn(View view) {
@@ -168,5 +199,46 @@ public class SignUpActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    private void handleFacebookAccessToken(AccessToken token) {
+
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            final DatabaseReference rootref;
+                            rootref=FirebaseDatabase.getInstance().getReference();
+                            final String uid = mAuth.getUid();
+                            rootref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if(dataSnapshot.child("Users").child(uid).exists()){
+                                        Toast.makeText(SignUpActivity.this, "User already exist", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Intent i = new Intent(SignUpActivity.this,MainActivity.class);
+                                        i.putExtra("type of reg", "facebook");
+                                        startActivity(i);
+                                        finish();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        } else {
+                            Toast.makeText(SignUpActivity.this, "Sign in Failed", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+    }
+
+    public void FacebookSignUp(View view) {
+        loginManager.logIn(SignUpActivity.this, Collections.singleton("email"));
     }
 }
