@@ -62,7 +62,11 @@ public class SignUpActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 Toast.makeText(SignUpActivity.this,"Signed Up",Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(SignUpActivity.this,MainActivity.class));
+                                Intent i = new Intent(SignUpActivity.this,MainActivity.class);
+                                i.putExtra("type of reg", "normal");
+                                i.putExtra("username",mail);
+                                i.putExtra("password",pass);
+                                startActivity(i);
                                 finish();
 
                             } else {
@@ -143,10 +147,12 @@ public class SignUpActivity extends AppCompatActivity {
                             rootref.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.child("users").child(uid).exists()) {
+                                    if (dataSnapshot.child("Users").child(uid).exists()) {
                                         Toast.makeText(SignUpActivity.this, "User already exist", Toast.LENGTH_SHORT).show();
                                     } else {
-                                        startActivity(new Intent(SignUpActivity.this, MainActivity.class));
+                                        Intent i = new Intent(SignUpActivity.this,MainActivity.class);
+                                        i.putExtra("type of reg", "google");
+                                        startActivity(i);
                                         finish();
                                     }
                                 }
