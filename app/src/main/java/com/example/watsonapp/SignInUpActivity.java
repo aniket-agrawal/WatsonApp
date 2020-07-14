@@ -162,7 +162,7 @@ public class SignInUpActivity extends AppCompatActivity {
                             rootref.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if(!(dataSnapshot.child("users").child(uid).exists())){
+                                    if(!(dataSnapshot.child("Users").child(uid).exists())){
                                         Toast.makeText(SignInUpActivity.this,"User not exist",Toast.LENGTH_SHORT).show();
                                     }
                                     else{

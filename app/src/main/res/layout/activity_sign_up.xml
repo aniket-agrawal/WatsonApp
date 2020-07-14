@@ -154,7 +154,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@+id/already_have_account"
-                android:text="SignUp Using Google ID"
+                android:text="Sign Up Using Google ID"
                 android:layout_marginTop="20dp"
                 android:onClick="GoogleSignUp"
                 android:layout_marginLeft="19dp"
@@ -166,7 +166,7 @@
                 android:drawableStart="@drawable/googlenew"
                 />
 
-            <Button
+            <com.facebook.login.widget.LoginButton
                 android:id="@+id/facebook_signup_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
