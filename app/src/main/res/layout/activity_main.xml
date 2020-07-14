@@ -39,6 +39,7 @@
         android:layout_marginRight="17dp"/>
 
     <EditText
+        android:id="@+id/age"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_centerInParent="true"
@@ -52,9 +53,18 @@
         android:id="@+id/input_gender"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="80dp"
+       android:layout_below="@+id/age"
+        android:layout_marginTop="80dp"
         android:padding="5dp"
         android:background="@drawable/inputs" />
+    <Button
+        android:id="@+id/submit_details_button"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/buttons"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"
+        android:layout_centerHorizontal="true"
+        android:text="Submit"/>
 
 </RelativeLayout>
