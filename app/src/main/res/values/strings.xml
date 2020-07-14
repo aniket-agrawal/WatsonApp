@@ -2,7 +2,6 @@
     <string name="app_name">WatsonApp</string>
 
 
-
     <string-array name="typeofgender">
         <item>Gender</item>
         <item>Male</item>
