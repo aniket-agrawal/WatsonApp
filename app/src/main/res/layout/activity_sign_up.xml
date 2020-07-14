@@ -156,6 +156,7 @@
                 android:layout_below="@+id/already_have_account"
                 android:text="SignUp Using Google ID"
                 android:layout_marginTop="20dp"
+                android:onClick="GoogleSignUp"
                 android:layout_marginLeft="19dp"
                 android:layout_marginRight="19dp"
                 android:textAllCaps="false"

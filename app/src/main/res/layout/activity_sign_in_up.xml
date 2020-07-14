@@ -142,6 +142,7 @@
                 android:text="Login Using Google ID"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="19dp"
+                android:onClick="GoogleSignIn"
                 android:layout_marginRight="19dp"
                 android:textAllCaps="false"
                 android:textSize="14sp"
@@ -150,7 +151,7 @@
                 android:drawableStart="@drawable/googlenew"
                 />
 
-            <Button
+            <com.facebook.login.widget.LoginButton
                 android:id="@+id/facebook_login_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
