@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText fullName;
     private EditText phoneNum;
     private TextView dob;
-    private String fullNameString="",typeOfReg="",currentUserId="",username,password,dobString="",phoneNumberString="";
+    private String fullNameString="",typeOfReg="",currentUserId="",dobString="",phoneNumberString="";
     private Button submitButton;
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
@@ -52,10 +52,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Intent i = getIntent();
         typeOfReg = i.getStringExtra("type of reg");
-        if(typeOfReg.equals("normal")){
-            username = i.getStringExtra("username");
-            password = i.getStringExtra("password");
-        }
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         database = FirebaseDatabase.getInstance();
@@ -111,27 +107,22 @@ public class MainActivity extends AppCompatActivity {
                 fullNameString = fullName.getText().toString();
                 phoneNumberString = phoneNum.getText().toString();
 
-
-
-                if(fullNameString.equals("") || dobString.equals("")){
+                if(fullNameString.equals("") || dobString.equals("") || phoneNumberString.equals("")){
                     Toast.makeText(MainActivity.this, "Please input all values", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     HashMap<String, Object> detailsMap = new HashMap<>();
-                    detailsMap.put("Full Name", fullName);
+                    detailsMap.put("Full Name", fullNameString);
                     detailsMap.put("Phone Number", phoneNumberString);
                     detailsMap.put("dob", dobString);
                     detailsMap.put("Type of Registration", typeOfReg);
-                    if(typeOfReg.equals("normal")){
-                        detailsMap.put("Username",username);
-                        detailsMap.put("Password",password);
-                    }
 
                     usersRef.child(currentUserId).updateChildren(detailsMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
                                 b = false;
+                                Toast.makeText(MainActivity.this, "Registered", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(MainActivity.this,MainPage.class));
                                 finish();
                             }

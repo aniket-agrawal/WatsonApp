@@ -46,17 +46,18 @@ import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    EditText email,password,confirmPassword;
-    FirebaseAuth mAuth;
-    String mail,pass,confirmPass;
-    private final static int RC_SIGN_IN = 123;
-    GoogleSignInClient mGoogleSignInClient;
-    CallbackManager callbackManager;
-    LoginManager loginManager;
+    EditText email,password,confirmPassword,Name,Phone;
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private DatabaseReference usersRef;
+    String mail="",pass="",confirmPass="",name="",phone="",dob="";
     ImageButton userDob;
+    boolean b = false;
+    FirebaseUser user;
     DatePickerDialog.OnDateSetListener mDateSetListener;
     TextView dobInfo;
 
@@ -66,11 +67,11 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
         email = (EditText)findViewById(R.id.signup_user_name);
         password = (EditText)findViewById(R.id.signup_password);
+        Name = (EditText)findViewById(R.id.user_name);
+        database = FirebaseDatabase.getInstance();
+        usersRef = database.getReference().child("Users");
+        Phone = (EditText)findViewById(R.id.user_phone_number);
         confirmPassword = (EditText)findViewById(R.id.confirm_password_signup);
-        mAuth = FirebaseAuth.getInstance();
-        createRequest();
-        callbackManager = CallbackManager.Factory.create();
-        loginManager = LoginManager.getInstance();
         userDob = findViewById(R.id.dob_user);
         dobInfo = findViewById(R.id.dob_info);
 
@@ -103,24 +104,10 @@ public class SignUpActivity extends AppCompatActivity {
                 c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 String dateOfBirth = DateFormat.getDateInstance(DateFormat.SHORT).format(c.getTime());
 //                "onDateSet: dd/mm/yyyy";
+                dob = dateOfBirth;
                 dobInfo.setText(dateOfBirth);
             }
         };
-        loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                handleFacebookAccessToken(loginResult.getAccessToken());
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException exception){
-            }
-        });
     }
 
     public void signIn(View view) {
@@ -131,23 +118,44 @@ public class SignUpActivity extends AppCompatActivity {
     public void Logup(View view) {
         mail = email.getText().toString().trim();
         pass = password.getText().toString().trim();
+        name = Name.getText().toString();
+        phone = Phone.getText().toString().trim();
         confirmPass = confirmPassword.getText().toString().trim();
         if(checkInput()) {
+            mAuth = FirebaseAuth.getInstance();
             mAuth.createUserWithEmailAndPassword(mail, pass)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(SignUpActivity.this,"Signed Up",Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(SignUpActivity.this,MainActivity.class);
-                                i.putExtra("type of reg", "normal");
-                                i.putExtra("username",mail);
-                                i.putExtra("password",pass);
-                                startActivity(i);
-                                finish();
+                                b = true;
+                                HashMap<String, Object> detailsMap = new HashMap<>();
+                                detailsMap.put("Full Name", name);
+                                detailsMap.put("Phone Number", phone);
+                                detailsMap.put("dob", dob);
+                                detailsMap.put("Type of Registration", "normal");
+                                detailsMap.put("Username",mail);
+                                detailsMap.put("Password",pass);
+                                String currentUserId = mAuth.getUid();
+                                user = mAuth.getCurrentUser();
+
+                                usersRef.child(currentUserId).updateChildren(detailsMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            b = false;
+                                            Toast.makeText(SignUpActivity.this, "Signed Up", Toast.LENGTH_SHORT).show();
+                                            startActivity(new Intent(SignUpActivity.this,MainPage.class));
+                                            finish();
+                                        }
+                                        else{
+                                            Toast.makeText(SignUpActivity.this, "Please retry.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
 
                             } else {
-                                Toast.makeText(SignUpActivity.this, "Authentication failed.",
+                                Toast.makeText(SignUpActivity.this, "User already exist.",
                                         Toast.LENGTH_SHORT).show();
                             }
 
@@ -159,8 +167,14 @@ public class SignUpActivity extends AppCompatActivity {
 
     private boolean checkInput() {
         boolean b = true;
+        if(name.isEmpty()){
+            Name.setError("Name is required");
+        }
+        if(phone.isEmpty()){
+            Phone.setError("Phone is required");
+        }
         if(mail.isEmpty()){
-            email.setError("Username is required");
+            email.setError("Email is required");
             b = false;
         }
         if(pass.isEmpty()){
@@ -175,116 +189,18 @@ public class SignUpActivity extends AppCompatActivity {
             confirmPassword.setError("Both password should match");
             b = false;
         }
+        if (dob.isEmpty()){
+            dobInfo.setError("Date of birth is required");
+        }
         return b;
     }
 
-    private void createRequest() {
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-    }
-
-    public void GoogleSignUp(View view) {
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
-            } catch (ApiException e) {
-                Toast.makeText(SignUpActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
-            }
+    protected void onDestroy() {
+        if(b){
+            user.delete();
         }
+        super.onDestroy();
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
-
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            final DatabaseReference rootref;
-                            rootref = FirebaseDatabase.getInstance().getReference();
-                            final String uid = mAuth.getUid();
-                            rootref.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.child("Users").child(uid).exists()) {
-                                        Toast.makeText(SignUpActivity.this, "User already exist", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Intent i = new Intent(SignUpActivity.this,MainActivity.class);
-                                        i.putExtra("type of reg", "google");
-                                        startActivity(i);
-                                        finish();
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-                        } else {
-                            Toast.makeText(SignUpActivity.this, "Sign in Failed", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-    }
-
-    private void handleFacebookAccessToken(AccessToken token) {
-
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            final DatabaseReference rootref;
-                            rootref=FirebaseDatabase.getInstance().getReference();
-                            final String uid = mAuth.getUid();
-                            rootref.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if(dataSnapshot.child("Users").child(uid).exists()){
-                                        Toast.makeText(SignUpActivity.this, "User already exist", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Intent i = new Intent(SignUpActivity.this,MainActivity.class);
-                                        i.putExtra("type of reg", "facebook");
-                                        startActivity(i);
-                                        finish();
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-                        } else {
-                            Toast.makeText(SignUpActivity.this, "Sign in Failed", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-    }
-
-    public void FacebookSignUp(View view) {
-        loginManager.logIn(SignUpActivity.this, Collections.singleton("email"));
-    }
 }
