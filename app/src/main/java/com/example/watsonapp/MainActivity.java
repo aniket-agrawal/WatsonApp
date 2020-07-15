@@ -3,15 +3,21 @@ package com.example.watsonapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,20 +27,24 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Spinner spinner;
-    private EditText firstName, lastName, age;
-    private String firstNameString="", lastNameSting="",gender="",typeOfReg="",currentUserId="",username,password;
-    private int ageInt=0;
+    private EditText fullName;
+    private EditText phoneNum;
+    private TextView dob;
+    private String fullNameString="",typeOfReg="",currentUserId="",username,password,dobString="",phoneNumberString="";
     private Button submitButton;
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
     private boolean b = true;
     private FirebaseUser user;
+    private ImageButton pickDob;
+    DatePickerDialog.OnDateSetListener mDateSetListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,46 +61,66 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         usersRef = database.getReference().child("Users");
         currentUserId = mAuth.getCurrentUser().getUid();
+        phoneNum = findViewById(R.id.signup_phone_number);
 
-        firstName = findViewById(R.id.first_name);
-        lastName = findViewById(R.id.last_name);
-        age = findViewById(R.id.age);
+        fullName = findViewById(R.id.full_name);
+
+        dob = findViewById(R.id.dob_info_signup);
         submitButton = findViewById(R.id.submit_details_button);
+        pickDob = findViewById(R.id.dob_user_signup);
 
 
-        spinner = (Spinner) findViewById(R.id.input_gender);
-        ArrayAdapter<String> myAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.typeofgender));
+        pickDob.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar cal = Calendar.getInstance();
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH);
+                int day = cal.get(Calendar.DAY_OF_MONTH);
 
-        spinner.setAdapter(myAdapter);
+                DatePickerDialog dialog = new DatePickerDialog(MainActivity.this,
+                        android.R.style.Theme_Holo_Light_Dialog_NoActionBar_MinWidth,
+                        mDateSetListener,
+                        year,month,day
+                );
+
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+            }
+        });
+
+        mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//                String dateOfBirth = dayOfMonth  + "/ " + month  + "/ " + year;
+                Calendar c = Calendar.getInstance();
+                c.set(Calendar.YEAR, year);
+                c.set(Calendar.MONTH, month);
+                c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                dobString = DateFormat.getDateInstance(DateFormat.SHORT).format(c.getTime());
+//                "onDateSet: dd/mm/yyyy";
+                dob.setText(dobString);
+            }
+        };
+
+
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firstNameString = firstName.getText().toString();
-                lastNameSting = lastName.getText().toString();
-                ageInt = Integer.parseInt(age.getText().toString());
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        gender = parent.getItemAtPosition(position).toString();
-                    }
+                fullNameString = fullName.getText().toString();
+                phoneNumberString = phoneNum.getText().toString();
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
 
-                    }
-                });
 
-                if(firstNameString.equals("") || lastName.equals("") || age.equals(0) || gender.equals("") || gender.equals("Gender")){
+                if(fullNameString.equals("") || dobString.equals("")){
                     Toast.makeText(MainActivity.this, "Please input all values", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     HashMap<String, Object> detailsMap = new HashMap<>();
-                    detailsMap.put("First Name", firstNameString);
-                    detailsMap.put("Last Name", lastNameSting);
-                    detailsMap.put("Age", ageInt);
-                    detailsMap.put("Gender", gender);
+                    detailsMap.put("Full Name", fullName);
+                    detailsMap.put("Phone Number", phoneNumberString);
+                    detailsMap.put("dob", dobString);
                     detailsMap.put("Type of Registration", typeOfReg);
                     if(typeOfReg.equals("normal")){
                         detailsMap.put("Username",username);
