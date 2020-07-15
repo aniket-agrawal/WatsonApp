@@ -1,9 +1,11 @@
 package com.example.watsonapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -96,7 +98,7 @@ public class SignInUpActivity extends AppCompatActivity {
                                 finish();
 
                             } else {
-                                Toast.makeText(SignInUpActivity.this, "Authentication failed.",
+                                Toast.makeText(SignInUpActivity.this, "User not exist",
                                         Toast.LENGTH_SHORT).show();
                             }
 
@@ -120,7 +122,8 @@ public class SignInUpActivity extends AppCompatActivity {
 
     private void createRequest() {
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder()
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
@@ -143,7 +146,7 @@ public class SignInUpActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                Toast.makeText(SignInUpActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignInUpActivity.this,"Error occurred: Retry",Toast.LENGTH_SHORT).show();
             }
         }
         else {
@@ -166,7 +169,10 @@ public class SignInUpActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     if(!(dataSnapshot.child("Users").child(uid).exists())){
-                                        Toast.makeText(SignInUpActivity.this,"User not exist",Toast.LENGTH_SHORT).show();
+                                        Intent i = new Intent(SignInUpActivity.this,MainActivity.class);
+                                        i.putExtra("type of reg", "google");
+                                        startActivity(i);
+                                        finish();
                                     }
                                     else{
                                         startActivity(new Intent(SignInUpActivity.this,MainPage.class));
@@ -202,7 +208,6 @@ public class SignInUpActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     if(!(dataSnapshot.child("Users").child(uid).exists())){
-                                        //Toast.makeText(SignInUpActivity.this,"User not exist",Toast.LENGTH_SHORT).show();
                                         Intent i = new Intent(SignInUpActivity.this,MainActivity.class);
                                         i.putExtra("type of reg", "facebook");
                                         startActivity(i);
