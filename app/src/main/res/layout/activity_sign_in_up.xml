@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SignInUpActivity"
-    android:background="@drawable/bgsignup">
+    android:background="#F46537">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,17 +19,17 @@
             android:layout_height="wrap_content">
 
 
-            <ImageView
+            <TextView
                 android:id="@+id/login_image"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="-11dp"
-                android:layout_marginLeft="-11dp"
-                android:layout_marginTop="-31dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/dontwastetime" />
+                android:layout_height="220dp"
+                android:fontFamily="@font/calligraffitti"
+                android:gravity="center"
+                android:text="WATSON"
+                android:textAlignment="center"
+                android:textSize="70dp"
+                android:typeface="serif"
+                android:textColor="@color/colorPrimaryDark"/>
 
             <EditText
                 android:id="@+id/login_user_name"
@@ -39,7 +39,7 @@
 
 
                 android:layout_below="@+id/login_image"
-                android:hint="User Name"
+                android:hint="Email..."
                 android:inputType="textEmailAddress"
                 android:background="@drawable/inputs"
                 android:padding="4dp"
@@ -81,6 +81,7 @@
                 />
 
 
+
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,29 +92,30 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="19dp"
                 android:layout_marginRight="19dp"
-                android:text="Login"
+                android:text="Sign In"
+                android:layout_marginBottom="12dp"
                 android:textAllCaps="false"
                 android:textSize="24sp"
                 android:textColor="@android:color/background_light"
                 android:background="@drawable/buttons"
                 />
 
-            <TextView
+            <Button
                 android:id="@+id/need_new_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:onClick="signUp"
-
-                android:layout_below="@+id/login_button"
+                android:layout_below="@+id/divider_facebook_create_new"
                 android:text="Create New Account"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="12dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="23dp"
                 android:textAlignment="center"
                 android:textSize="17sp"
+                android:background="@drawable/buttonscreatenewaccount"
                 android:textStyle="bold"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="#FFF"
                 />
 
 <!--            <Button-->
@@ -138,9 +140,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@+id/need_new_account"
-                android:text="Login Using Google ID"
-                android:layout_marginTop="20dp"
+                android:layout_below="@+id/divider_login_google"
+                android:text="Directly Login Using Google"
+                android:layout_marginTop="12dp"
                 android:layout_marginLeft="19dp"
                 android:onClick="GoogleSignIn"
                 android:layout_marginRight="19dp"
@@ -157,11 +159,12 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@+id/google_login_button"
-                android:text="Login Using Facebook"
+                android:text="Directly Login Using Facebook"
                 android:onClick="FacebookSignIn"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="19dp"
                 android:layout_marginRight="19dp"
+                android:layout_marginBottom="12dp"
                 android:textAllCaps="false"
                 android:textSize="14sp"
                 android:textColor="@android:color/background_light"
@@ -169,6 +172,19 @@
                 android:drawableStart="@drawable/facebooknew"
                 />
 
+            <View
+                android:id="@+id/divider_login_google"
+                android:layout_width="match_parent"
+                android:layout_below="@id/login_button"
+                android:layout_height="5dp"
+                android:background="@android:color/white" />
+
+            <View
+                android:id="@+id/divider_facebook_create_new"
+                android:layout_width="match_parent"
+                android:layout_below="@id/facebook_login_button"
+                android:layout_height="5dp"
+                android:background="@android:color/white" />
 
 
         </RelativeLayout>

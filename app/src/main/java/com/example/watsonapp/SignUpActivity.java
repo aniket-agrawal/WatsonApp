@@ -3,11 +3,17 @@ package com.example.watsonapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -36,7 +42,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -48,6 +56,9 @@ public class SignUpActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     CallbackManager callbackManager;
     LoginManager loginManager;
+    ImageButton userDob;
+    DatePickerDialog.OnDateSetListener mDateSetListener;
+    TextView dobInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +71,41 @@ public class SignUpActivity extends AppCompatActivity {
         createRequest();
         callbackManager = CallbackManager.Factory.create();
         loginManager = LoginManager.getInstance();
+        userDob = findViewById(R.id.dob_user);
+        dobInfo = findViewById(R.id.dob_info);
+
+        userDob.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar cal = Calendar.getInstance();
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH);
+                int day = cal.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog dialog = new DatePickerDialog(SignUpActivity.this,
+                        android.R.style.Theme_Holo_Light_Dialog_NoActionBar_MinWidth,
+                        mDateSetListener,
+                        year,month,day
+                        );
+
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+            }
+        });
+
+        mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+//                String dateOfBirth = dayOfMonth  + "/ " + month  + "/ " + year;
+                Calendar c = Calendar.getInstance();
+                c.set(Calendar.YEAR, year);
+                c.set(Calendar.MONTH, month);
+                c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                String dateOfBirth = DateFormat.getDateInstance(DateFormat.SHORT).format(c.getTime());
+//                "onDateSet: dd/mm/yyyy";
+                dobInfo.setText(dateOfBirth);
+            }
+        };
         loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
