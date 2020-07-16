@@ -16,6 +16,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.login.LoginBehavior;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -38,8 +39,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+
+import static com.facebook.login.LoginBehavior.NATIVE_WITH_FALLBACK;
 
 public class SignInUpActivity extends AppCompatActivity {
 
@@ -62,6 +68,8 @@ public class SignInUpActivity extends AppCompatActivity {
         createRequest();
         callbackManager = CallbackManager.Factory.create();
         loginManager = LoginManager.getInstance();
+        LoginBehavior loginBehavior = NATIVE_WITH_FALLBACK;
+        loginManager.setLoginBehavior(loginBehavior);
         loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -123,7 +131,7 @@ public class SignInUpActivity extends AppCompatActivity {
     private void createRequest() {
 
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder()
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
@@ -156,7 +164,7 @@ public class SignInUpActivity extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
 
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(),null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -234,6 +242,9 @@ public class SignInUpActivity extends AppCompatActivity {
     }
 
     public void FacebookSignIn(View view) {
-        loginManager.logIn(SignInUpActivity.this, Collections.singleton("email"));
+        List<String> anotherList = new ArrayList<>();
+        anotherList.add("email");
+        anotherList.add("public_profile");
+        loginManager.logIn(SignInUpActivity.this, (Collection<String>) anotherList);
     }
 }

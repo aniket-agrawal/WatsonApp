@@ -20,6 +20,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
+    GoogleSignInClient googleSignInClient;
+    CallbackManager callbackManager;
+    LoginManager loginManager;
     private boolean b = true;
     private FirebaseUser user;
     private ImageButton pickDob;
@@ -54,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
         typeOfReg = i.getStringExtra("type of reg");
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        callbackManager = CallbackManager.Factory.create();
+        loginManager = LoginManager.getInstance();
         database = FirebaseDatabase.getInstance();
         usersRef = database.getReference().child("Users");
         currentUserId = mAuth.getCurrentUser().getUid();
@@ -140,7 +156,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if(b){
-            user.delete();
+            if(typeOfReg.equals("google")) {
+                googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        user.delete();
+                    }
+                });
+            }
+            else {
+                loginManager.logOut();
+                user.delete();
+            }
         }
         super.onDestroy();
     }
