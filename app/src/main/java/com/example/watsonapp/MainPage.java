@@ -1,13 +1,16 @@
 package com.example.watsonapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AppOpsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.se.omapi.Session;
 import android.service.textservice.SpellCheckerService;
 import android.util.Log;
@@ -38,6 +41,7 @@ import static com.facebook.login.LoginBehavior.NATIVE_WITH_FALLBACK;
 
 public class MainPage extends AppCompatActivity {
 
+    int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1;
     FirebaseAuth mAuth;
     GoogleSignInClient googleSignInClient;
     LoginManager loginManager;
@@ -98,4 +102,36 @@ public class MainPage extends AppCompatActivity {
         }
     }
 
+    public void usage(View view) {
+        AppOpsManager appOps = (AppOpsManager)
+                getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), getPackageName());
+        if(mode == AppOpsManager.MODE_ALLOWED){
+            startActivity(new Intent(MainPage.this,ShowUsage.class));
+            finish();
+        }
+        else{
+            startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS){
+            AppOpsManager appOps = (AppOpsManager)
+                    getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(), getPackageName());
+            if(mode == AppOpsManager.MODE_ALLOWED){
+                startActivity(new Intent(MainPage.this,ShowUsage.class));
+                finish();
+            }
+            else{
+                Toast.makeText(MainPage.this,"This APP is not for you." , Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
