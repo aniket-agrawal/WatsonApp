@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,22 +31,17 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder> {
     Activity activity;
-    ArrayList<ApplicationInfo> applicationInfos;
-    PackageManager pm;
+    ArrayList<Pair<String, Pair<String, Drawable>>> apps = new ArrayList<Pair<String, Pair<String,Drawable>>>();
     String myDate = "";
     Calendar calendar;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    Date date;
     long startMillis;
     String myDate1 = "";
-    SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    Date date1;
     long endMillis;
 
-    public ListAdapter(Activity activity, ArrayList<ApplicationInfo> applicationInfos, PackageManager pm) throws ParseException {
+    public ListAdapter(Activity activity, ArrayList<Pair<String, Pair<String,Drawable>>> apps) {
         this.activity = activity;
-        this.applicationInfos = applicationInfos;
-        this.pm = pm;
+        this.apps = apps;
     }
 
     @NonNull
@@ -70,7 +67,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder
 
     @Override
     public int getItemCount() {
-        return applicationInfos.size();
+        return apps.size();
     }
 
 
@@ -87,24 +84,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder
         }
 
         public void bindView(int position){
-            ApplicationInfo applicationInfo = applicationInfos.get(position);
-            appName.setText(applicationInfo.loadLabel(pm).toString());
-            appIcon.setImageDrawable(applicationInfo.loadIcon(pm));
-            UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
-            Map<String, UsageStats> lUsageStatsMap = mUsageStatsManager.
-                    queryAndAggregateUsageStats(startMillis, endMillis);
-            try {
-                long totalTimeUsageInMillis = lUsageStatsMap.get(applicationInfo.packageName).
-                        getTotalTimeInForeground();
-                long timeInSec = totalTimeUsageInMillis/1000;
-                long hour = timeInSec/3600;
-                long min = (timeInSec-(hour*3600))/60;
-                String t = hour + " hr, " + min + " min";
-                appUsage.setText(t);
-            }
-            catch (Exception e){
-                Log.d("Aniket",applicationInfo.packageName);
-            }
+            String usage = apps.get(position).first;
+            String name = apps.get(position).second.first;
+            Drawable icon = apps.get(position).second.second;
+            appUsage.setText(usage);
+            appIcon.setImageDrawable(icon);
+            appName.setText(name);
         }
 
 
