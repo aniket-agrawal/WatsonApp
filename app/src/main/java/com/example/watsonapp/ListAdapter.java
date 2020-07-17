@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +31,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder
     Activity activity;
     ArrayList<ApplicationInfo> applicationInfos;
     PackageManager pm;
-    String myDate = "2020/07/10 23:59:59";
+    String myDate = "";
+    Calendar calendar;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    Date date = sdf.parse(myDate);
-    long startMillis = date.getTime();
-    String myDate1 = "2020/07/11 13:00:00";
+    Date date;
+    long startMillis;
+    String myDate1 = "";
     SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    Date date1 = sdf1.parse(myDate1);
-    long endMillis = date1.getTime();
+    Date date1;
+    long endMillis;
 
     public ListAdapter(Activity activity, ArrayList<ApplicationInfo> applicationInfos, PackageManager pm) throws ParseException {
         this.activity = activity;
@@ -49,6 +51,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder
     @Override
     public ListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_for_usage,parent,false);
+        calendar = Calendar.getInstance();
+        myDate1 = sdf.format(calendar.getTime());
+        startMillis = calendar.getTimeInMillis() - 604800000;
+
+
+
+
+        endMillis = calendar.getTimeInMillis();
+        myDate = sdf.format(startMillis);
         return new ListViewHolder(view);
 }
 
