@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.Map;
 public class ShowUsage extends AppCompatActivity {
     private final static String TAG = "Aniket";
     PackageManager pm;
-    ArrayList<Pair<String, Pair<String,Drawable>>> apps = new ArrayList<Pair<String, Pair<String,Drawable>>>();
+    ArrayList<Apps> apps = new ArrayList<Apps>();
     RecyclerView recyclerView;
     Activity activity;
     String myDate = "";
@@ -41,6 +42,7 @@ public class ShowUsage extends AppCompatActivity {
     long startMillis;
     String myDate1 = "";
     long endMillis;
+    Map<String, UsageStats> lUsageStatsMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,49 +51,28 @@ public class ShowUsage extends AppCompatActivity {
         pm = getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         activity = this;
+        apps.clear();
         recyclerView = (RecyclerView)findViewById(R.id.usage);
         calendar = Calendar.getInstance();
         myDate1 = sdf.format(calendar.getTime());
-        startMillis = calendar.getTimeInMillis() - 604800000;
+        long t = 86400000;
+        t = t*365;
+        startMillis = calendar.getTimeInMillis() - t;
+        Log.d("Aniket",String.valueOf(t));
         endMillis = calendar.getTimeInMillis();
         myDate = sdf.format(startMillis);
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
-        Map<String, UsageStats> lUsageStatsMap = mUsageStatsManager.
+        lUsageStatsMap = mUsageStatsManager.
                 queryAndAggregateUsageStats(startMillis, endMillis);
         for(ApplicationInfo app : packages) {
             if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
-                try {
-                    long totalTimeUsageInMillis = lUsageStatsMap.get(app.packageName).
-                            getTotalTimeInForeground();
-                    long timeInSec = totalTimeUsageInMillis / 1000;
-                    long hour = timeInSec / 3600;
-                    long min = (timeInSec - (hour * 3600)) / 60;
-                    if (hour != 0 && min != 0) {
-                        String usage = hour + " hr, " + min + " min";
-                        Pair<String, Drawable> appNameIcon = new Pair<>(app.loadLabel(pm).toString(), app.loadIcon(pm));
-                        apps.add(new Pair<String, Pair<String, Drawable>>(usage, appNameIcon));
-                    }
-                } catch (Exception e) {
-                    Log.d("Aniket", app.packageName);
-                }
+                addApps(app);
             } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
             } else {
-                try {
-                    long totalTimeUsageInMillis = lUsageStatsMap.get(app.packageName).
-                            getTotalTimeInForeground();
-                    long timeInSec = totalTimeUsageInMillis / 1000;
-                    long hour = timeInSec / 3600;
-                    long min = (timeInSec - (hour * 3600)) / 60;
-                    if (hour != 0 && min != 0) {
-                        String usage = hour + " hr, " + min + " min";
-                        Pair<String, Drawable> appNameIcon = new Pair<>(app.loadLabel(pm).toString(), app.loadIcon(pm));
-                        apps.add(new Pair<String, Pair<String, Drawable>>(usage, appNameIcon));
-                    }
-                } catch (Exception e) {
-                    Log.d("Aniket", app.packageName);
-                }
+                addApps(app);
             }
         }
+        Collections.sort(apps, Apps.appTime);
         initReceivedRecyclerView();
     }
 
@@ -100,6 +81,21 @@ public class ShowUsage extends AppCompatActivity {
         recyclerView.setAdapter(listAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
+    }
+
+    public void addApps(ApplicationInfo app){
+        try {
+            long totalTimeUsageInMillis = lUsageStatsMap.get(app.packageName).
+                    getTotalTimeInForeground();
+            long timeInSec = totalTimeUsageInMillis / 1000;
+            long hour = timeInSec / 3600;
+            long min = (timeInSec - (hour * 3600)) / 60;
+            if (hour!=0 || min!=0) {
+                apps.add(new Apps(timeInSec,app.loadLabel(pm).toString(), app.loadIcon(pm)));
+            }
+        } catch (Exception e) {
+            Log.d("Aniket", app.packageName);
+        }
     }
 }
 

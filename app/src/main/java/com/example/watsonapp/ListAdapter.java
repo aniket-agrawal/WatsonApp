@@ -31,7 +31,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder> {
     Activity activity;
-    ArrayList<Pair<String, Pair<String, Drawable>>> apps = new ArrayList<Pair<String, Pair<String,Drawable>>>();
+    ArrayList<Apps> apps = new ArrayList<Apps>();
     String myDate = "";
     Calendar calendar;
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -39,7 +39,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder
     String myDate1 = "";
     long endMillis;
 
-    public ListAdapter(Activity activity, ArrayList<Pair<String, Pair<String,Drawable>>> apps) {
+    public ListAdapter(Activity activity, ArrayList<Apps> apps) {
         this.activity = activity;
         this.apps = apps;
     }
@@ -84,9 +84,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder
         }
 
         public void bindView(int position){
-            String usage = apps.get(position).first;
-            String name = apps.get(position).second.first;
-            Drawable icon = apps.get(position).second.second;
+            Apps app = apps.get(position);
+            long timeInSec = app.appUsage;
+            String name = app.appName;
+            Drawable icon = app.appIcon;
+            long hour = timeInSec / 3600;
+            long min = (timeInSec - (hour * 3600)) / 60;
+            String usage = hour + " hr, " + min + " min";
             appUsage.setText(usage);
             appIcon.setImageDrawable(icon);
             appName.setText(name);
