@@ -9,7 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -49,6 +53,8 @@ import static com.facebook.login.LoginBehavior.NATIVE_WITH_FALLBACK;
 
 public class SignInUpActivity extends AppCompatActivity {
 
+    Animation atg,atgone,atgtwo;
+
     EditText email,password;
     FirebaseAuth mAuth;
     String mail,pass;
@@ -56,14 +62,45 @@ public class SignInUpActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     CallbackManager callbackManager;
     LoginManager loginManager;
-
+    TextView loginImage, forgetPasswordLink;
+    Button loginButton, googleButton, facebookButton, createAccountButton;
+    View divider1, divider2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in_up);
+
+        atg = AnimationUtils.loadAnimation(this,R.anim.atg);
+        atgone = AnimationUtils.loadAnimation(this,R.anim.atgone);
+        atgtwo = AnimationUtils.loadAnimation(this,R.anim.atgtwo);
+
+        loginImage = findViewById(R.id.login_image);
+        forgetPasswordLink = findViewById(R.id.forget_password_link);
+        loginButton = findViewById(R.id.login_button);
+        googleButton = findViewById(R.id.google_login_button);
+        facebookButton = findViewById(R.id.facebook_login_button);
+        createAccountButton = findViewById(R.id.need_new_account);
         email = (EditText)findViewById(R.id.login_user_name);
         password = (EditText)findViewById(R.id.login_password);
+        divider1 = findViewById(R.id.divider_facebook_create_new);
+        divider2 = findViewById(R.id.divider_login_google);
+
+        loginImage.startAnimation(atg);
+
+        email.startAnimation(atgone);
+        password.startAnimation(atgone);
+        forgetPasswordLink.startAnimation(atgone);
+        loginButton.startAnimation(atgone);
+
+        googleButton.startAnimation(atgtwo);
+        facebookButton.startAnimation(atgtwo);
+        createAccountButton.startAnimation(atgtwo);
+
+//        divider1.setVisibility(View.VISIBLE);
+//        divider2.setVisibility(View.VISIBLE);
+
+
         mAuth = FirebaseAuth.getInstance();
         createRequest();
         callbackManager = CallbackManager.Factory.create();

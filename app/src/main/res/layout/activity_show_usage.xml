@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".ShowUsage">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        >
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/usage"
         android:layout_width="match_parent"
@@ -14,5 +21,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
