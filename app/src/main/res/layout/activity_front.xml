@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FrontActivity"
+    android:background="#04606E">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="420dp"
+        android:id="@+id/graph_usage"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/dontwastetime"/>
+
+            <ImageView
+                android:id="@+id/add_bad_apps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_plus_red"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/graph_usage"/>
+            <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_bad_apps"
+        android:textSize="20sp"
+                android:layout_marginTop="5dp"
+                android:textColor="@android:color/holo_red_light"
+        android:text="Bad Apps"
+        android:layout_below="@+id/graph_usage"
+        android:textStyle="bold"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/recycler_view_show_icons"
+        android:orientation="horizontal"
+        android:layout_below="@+id/add_bad_apps"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/holo_red_light">
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_good_apps"
+        android:textColor="@android:color/holo_green_light"
+        android:textSize="20sp"
+        android:text="Good Apps"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/recycler_view_show_icons"
+        android:textStyle="bold"/>
+            <ImageView
+                android:id="@+id/add_good_apps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_plus_green"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/recycler_view_show_icons"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/recycler_view_show_icons_good"
+        android:orientation="horizontal"
+        android:layout_below="@+id/add_good_apps"
+        android:layout_marginBottom="10dp"
+        android:background="@android:color/holo_green_light">
+
+    </androidx.recyclerview.widget.RecyclerView>
+        </RelativeLayout>
+    </ScrollView>
+
+</RelativeLayout>

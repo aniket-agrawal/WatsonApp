@@ -139,7 +139,7 @@ public class SignInUpActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 Toast.makeText(SignInUpActivity.this,"Signed In",Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(SignInUpActivity.this,MainPage.class));
+                                startActivity(new Intent(SignInUpActivity.this,FrontActivity.class));
                                 finish();
 
                             } else {
