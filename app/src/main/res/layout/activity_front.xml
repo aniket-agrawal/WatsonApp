@@ -15,21 +15,21 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-    <ImageView
+    <com.github.mikephil.charting.charts.BarChart
         android:layout_width="match_parent"
         android:layout_height="420dp"
         android:id="@+id/graph_usage"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/dontwastetime"/>
+        android:layout_marginBottom="10dp"/>
 
             <ImageView
                 android:id="@+id/add_bad_apps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@mipmap/ic_plus_red"
+                android:onClick="badAdd"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/graph_usage"/>
             <TextView

@@ -5,13 +5,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,41 +33,65 @@ import java.util.Map;
 
 public class FrontActivity extends AppCompatActivity {
 
+    BarChart barChart;
     private final static String TAG = "Soumil";
     PackageManager pm;
     ArrayList<Apps> apps = new ArrayList<Apps>();
     RecyclerView recyclerViewApps, recyclerViewAppsGood;
     Activity activity;
-//    String myDate = "";
-//    Calendar calendar;
-//    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-//    long startMillis;
-//    String myDate1 = "";
-//    long endMillis;
-//    Map<String, UsageStats> lUsageStatsMap;
+    String myDate = "";
+    Calendar calendar;
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+    long startMillis;
+    String myDate1 = "";
+    long endMillis;
+    Map<String, UsageStats> lUsageStatsMap;
+    long totalTimeUsageInMillis;
+    long timeInSec;
+    float hour;
+    Dialog myDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_front);
-
+        barChart = findViewById(R.id.graph_usage);
+        myDialog = new Dialog(this);
         pm = getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         activity = this;
         apps.clear();
         recyclerViewApps = (RecyclerView)findViewById(R.id.recycler_view_show_icons);
         recyclerViewAppsGood = (RecyclerView)findViewById(R.id.recycler_view_show_icons_good);
-//        calendar = Calendar.getInstance();
-//        myDate1 = sdf.format(calendar.getTime());
-//        long t = 86400000;
-//        t = t*365;
-//        startMillis = calendar.getTimeInMillis() - t;
-//        Log.d("Aniket",String.valueOf(t));
-//        endMillis = calendar.getTimeInMillis();
-//        myDate = sdf.format(startMillis);
-//        UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
-//        lUsageStatsMap = mUsageStatsManager.
-//                queryAndAggregateUsageStats(startMillis, endMillis);
+        calendar = Calendar.getInstance();
+        endMillis = calendar.getTimeInMillis();
+        calendar.set(Calendar.HOUR_OF_DAY, 00);
+        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.SECOND, 00);
+        startMillis =calendar.getTimeInMillis();
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
+        lUsageStatsMap = mUsageStatsManager.
+                queryAndAggregateUsageStats(startMillis, endMillis);
+        totalTimeUsageInMillis = lUsageStatsMap.get("com.whatsapp").
+                getTotalTimeInForeground();
+        timeInSec = totalTimeUsageInMillis / 1000;
+        hour = ((float) (timeInSec*1.0)) / 3600;
+        ArrayList<BarEntry> barEntries = new ArrayList<>();
+        barEntries.add(new BarEntry(0,hour));
+        endMillis = startMillis;
+        startMillis = startMillis - 86400000;
+        lUsageStatsMap = mUsageStatsManager.
+                queryAndAggregateUsageStats(startMillis, endMillis);
+        totalTimeUsageInMillis = lUsageStatsMap.get("com.whatsapp").getTotalTimeInForeground();
+        timeInSec = totalTimeUsageInMillis / 1000;
+        hour = timeInSec / 3600;
+        barEntries.add(new BarEntry(1,hour));
+        BarDataSet barDataSet = new BarDataSet(barEntries,"Usage");
+        BarData barData = new BarData();
+        barData.addDataSet(barDataSet);
+        barChart.setData(barData);
+        barChart.invalidate();
         for(ApplicationInfo app : packages) {
             if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
                 addApps(app);
@@ -65,7 +100,6 @@ public class FrontActivity extends AppCompatActivity {
                 addApps(app);
             }
         }
-//        Collections.sort(apps, Apps.appTime);
         initReceivedRecyclerView();
     }
 
@@ -93,5 +127,22 @@ public class FrontActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.d("Soumil", app.packageName);
         }
+    }
+
+    public void badAdd(View view) {
+        TextView txtclose;
+        Button btnFollow;
+        myDialog.setContentView(R.layout.bad_apps_add);
+        txtclose =(TextView) myDialog.findViewById(R.id.txtclose);
+        txtclose.setText("X");
+        btnFollow = (Button) myDialog.findViewById(R.id.btnfollow);
+        txtclose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myDialog.dismiss();
+            }
+        });
+        myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        myDialog.show();
     }
 }
