@@ -1,16 +1,13 @@
 package com.example.watsonapp;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,14 +17,15 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements Filterable {
+public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadAppsAdapter.ViewHolder> implements Filterable {
+
     private final static String TAG = "Soumil";
 
     Activity activity;
     ArrayList<Apps> apps = new ArrayList<Apps>();
     ArrayList<Apps> appsFull;
 
-    public RecyclerAdapter(Activity activity, ArrayList<Apps> apps) {
+    public RecyclerBadAppsAdapter(Activity activity, ArrayList<Apps> apps) {
         this.activity = activity;
         this.apps = apps;
         appsFull = new ArrayList<Apps>(apps);
@@ -35,8 +33,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.horizontal_recycler_card,parent,false);
+    public RecyclerBadAppsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_for_usage,parent,false);
 //        View newView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_for_usage,parent,false);
 //        if(activity.getClass().equals(BadAppsActivity.class)){
 //            return new ViewHolder(newView);
@@ -44,13 +42,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 //        else{
 //            Log.d(TAG, activity.toString());
 //            Toast.makeText(activity, activity.toString(), Toast.LENGTH_SHORT).show();
-        return new ViewHolder(view);
+        return new RecyclerBadAppsAdapter.ViewHolder(view);
 //    }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ((ViewHolder) holder).bindView(position);
+    public void onBindViewHolder(@NonNull RecyclerBadAppsAdapter.ViewHolder holder, int position) {
+        ((RecyclerBadAppsAdapter.ViewHolder) holder).bindView(position);
     }
 
 
@@ -66,8 +64,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageIcon = itemView.findViewById(R.id.icon_image_card);
-            nameApp = itemView.findViewById(R.id.card_app_name);
+            imageIcon = itemView.findViewById(R.id.app_icon);
+            nameApp = itemView.findViewById(R.id.app_name);
         }
 
         public void bindView(int position)
@@ -118,4 +116,5 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         }
     };
+
 }
