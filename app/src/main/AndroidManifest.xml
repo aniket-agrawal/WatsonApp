@@ -16,7 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FrontActivity"></activity>
+        <activity android:name=".BadAppsActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"></activity>
+        <activity android:name=".FrontActivity" />
         <activity android:name=".ShowUsage" />
         <activity android:name=".MainPage" />
         <activity android:name=".SignInUpActivity" />
