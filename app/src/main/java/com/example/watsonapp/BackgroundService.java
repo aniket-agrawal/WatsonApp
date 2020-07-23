@@ -52,6 +52,7 @@ public class BackgroundService extends Service {
     private void block(){
         if(printForegroundTask().equals("com.whatsapp")){
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                Log.d("Soumil", "Blocking");
                 Intent myIntent = new Intent(BackgroundService.this,Block.class);
                 myIntent.addCategory(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                 myIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);

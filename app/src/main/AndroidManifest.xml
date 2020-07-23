@@ -7,7 +7,7 @@
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -17,10 +17,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".DetailAppUsage"></activity>
+
         <service
-        android:name=".BackgroundService"
-        android:exported="false"
-        android:stopWithTask="false" />
+            android:name=".BackgroundService"
+            android:exported="false"
+            android:stopWithTask="false" />
+
         <activity
             android:name=".BadAppsActivity"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
@@ -38,7 +41,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
