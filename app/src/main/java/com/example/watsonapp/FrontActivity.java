@@ -1,11 +1,13 @@
 package com.example.watsonapp;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.AppOpsManager;
 import android.app.Dialog;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -16,13 +18,17 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -33,28 +39,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class FrontActivity extends AppCompatActivity {
 
-    BarChart barChart;
     private final static String TAG = "Soumil";
+    private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1;
     PackageManager pm;
     ArrayList<Apps> apps = new ArrayList<Apps>();
+    ArrayList<Apps> badApps = new ArrayList<Apps>();
     RecyclerView recyclerViewApps, recyclerViewAppsGood;
     Activity activity;
-    String myDate = "";
-    Calendar calendar;
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+    Context context;
     long startMillis;
-    String myDate1 = "";
     long endMillis;
-    Map<String, UsageStats> lUsageStatsMap;
-    long totalTimeUsageInMillis;
-    long timeInSec;
-    float hour;
+    BarChart barChart;
     Dialog myDialog;
+    String packagename;
+    HashMap<String,BlockApp> blockApps = new HashMap<String,BlockApp>();;
 
 
     @Override
@@ -66,37 +70,12 @@ public class FrontActivity extends AppCompatActivity {
         pm = getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         activity = this;
+        context = getApplicationContext();
         apps.clear();
+        badApps.clear();
+        usage();
         recyclerViewApps = (RecyclerView)findViewById(R.id.recycler_view_show_icons);
         recyclerViewAppsGood = (RecyclerView)findViewById(R.id.recycler_view_show_icons_good);
-        calendar = Calendar.getInstance();
-        endMillis = calendar.getTimeInMillis();
-        calendar.set(Calendar.HOUR_OF_DAY, 00);
-        calendar.set(Calendar.MINUTE, 00);
-        calendar.set(Calendar.SECOND, 00);
-        startMillis =calendar.getTimeInMillis();
-        UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
-        lUsageStatsMap = mUsageStatsManager.
-                queryAndAggregateUsageStats(startMillis, endMillis);
-        totalTimeUsageInMillis = lUsageStatsMap.get("com.whatsapp").
-                getTotalTimeInForeground();
-        timeInSec = totalTimeUsageInMillis / 1000;
-        hour = ((float) (timeInSec*1.0)) / 3600;
-        ArrayList<BarEntry> barEntries = new ArrayList<>();
-        barEntries.add(new BarEntry(0,hour));
-        endMillis = startMillis;
-        startMillis = startMillis - 86400000;
-        lUsageStatsMap = mUsageStatsManager.
-                queryAndAggregateUsageStats(startMillis, endMillis);
-        totalTimeUsageInMillis = lUsageStatsMap.get("com.whatsapp").getTotalTimeInForeground();
-        timeInSec = totalTimeUsageInMillis / 1000;
-        hour = timeInSec / 3600;
-        barEntries.add(new BarEntry(1,hour));
-        BarDataSet barDataSet = new BarDataSet(barEntries,"Usage");
-        BarData barData = new BarData();
-        barData.addDataSet(barDataSet);
-        barChart.setData(barData);
-        barChart.invalidate();
         for(ApplicationInfo app : packages) {
             if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
                 addApps(app);
@@ -110,12 +89,45 @@ public class FrontActivity extends AppCompatActivity {
 
     private void initReceivedRecyclerView(){
         RecyclerAdapter listAdapter = new RecyclerAdapter(activity,apps);
-        recyclerViewApps.setAdapter(listAdapter);
+        RecyclerAdapter listAdapter1 = new RecyclerAdapter(activity,badApps);
+        recyclerViewApps.setAdapter(listAdapter1);
         recyclerViewAppsGood.setAdapter(listAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         RecyclerView.LayoutManager layoutManagerGood = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerViewApps.setLayoutManager(layoutManager);
         recyclerViewAppsGood.setLayoutManager(layoutManagerGood);
+    }
+
+    void usage() {
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+        Calendar cal = Calendar.getInstance();
+        ArrayList<BarEntry> barEntries = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.MINUTE, 00);
+        cal.set(Calendar.SECOND, 00);
+        for(int i= 17;i < 24;i++){
+            cal.set(Calendar.DAY_OF_MONTH, i);
+            startMillis = cal.getTimeInMillis();
+            endMillis = startMillis+3600000;
+            List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,startMillis, endMillis);
+            Log.d("Aniket",sdf.format(startMillis));
+            Log.d("Aniket",sdf.format(endMillis));
+            for (UsageStats usageStats : lUsageStatsMap){
+                if("com.whatsapp".equals(usageStats.getPackageName())){
+                    long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
+                    long timeInSec = totalTimeUsageInMillis/1000;
+                    float hour = (float) ((timeInSec*1.0)/3600);
+                    Log.d(String.valueOf(i), String.valueOf(hour));
+                    barEntries.add(new BarEntry(i,hour));
+                }
+            }
+        }
+        BarDataSet barDataSet = new BarDataSet(barEntries,"usage");
+        BarData barData = new BarData();
+        barData.addDataSet(barDataSet);
+        barChart.setData(barData);
+
     }
 
     public void addApps(ApplicationInfo app){
@@ -134,25 +146,112 @@ public class FrontActivity extends AppCompatActivity {
         }
     }
 
-    public void badAdd(View view) {
-//        TextView txtclose;
-//        Button btnFollow;
-//        myDialog.setContentView(R.layout.bad_apps_add);
-//        txtclose =(TextView) myDialog.findViewById(R.id.txtclose);
-//        txtclose.setText("X");
-//        btnFollow = (Button) myDialog.findViewById(R.id.btnfollow);
-//        txtclose.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                myDialog.dismiss();
-//            }
-//        });
-//        myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//        myDialog.show();
+    public void badAdd(View view) throws PackageManager.NameNotFoundException {
+        myDialog.setContentView(R.layout.bad_apps_add);
+        TextView txtclose;
+        final EditText hour = myDialog.findViewById(R.id.hour);
+        final EditText min = myDialog.findViewById(R.id.min);
+        final ImageView i1 = myDialog.findViewById(R.id.i1);
+        final ImageView i2 = myDialog.findViewById(R.id.i2);
+        final ImageView i3 = myDialog.findViewById(R.id.i3);
+        final ImageView i4 = myDialog.findViewById(R.id.i4);
+        final ImageView i5 = myDialog.findViewById(R.id.i5);
+        final TextView n1 = myDialog.findViewById(R.id.n1);
+        final TextView n2 = myDialog.findViewById(R.id.n2);
+        final TextView n3 = myDialog.findViewById(R.id.n3);
+        final TextView n4 = myDialog.findViewById(R.id.n4);
+        final TextView n5 = myDialog.findViewById(R.id.n5);
+        setApp(i1,n1,"com.whatsapp");
+        setApp(i2,n2,"com.instagram.android");
+        setApp(i3,n3,"com.facebook.katana");
+        setApp(i4,n4,"com.tencent.ig");
+        setApp(i5,n5,"com.ludo.king");
+        txtclose =(TextView) myDialog.findViewById(R.id.txtclose);
+        txtclose.setText("X");
+        Button button = myDialog.findViewById(R.id.add);
+        txtclose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myDialog.dismiss();
+            }
+        });
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    storeData(packagename,Integer.parseInt(hour.getText().toString()),Integer.parseInt(min.getText().toString()));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        myDialog.show();
+    }
+
+
+    public void goodAdd(View view) {
         Intent badAppsIntent = new Intent(FrontActivity.this, BadAppsActivity.class);
         startActivity(badAppsIntent);
         finish();
     }
 
+    private void setApp(ImageView i, TextView n, final String s) throws PackageManager.NameNotFoundException {
+        PackageManager pm = getPackageManager();
+        ApplicationInfo applicationInfo = new ApplicationInfo();
+        try {
+            applicationInfo = pm.getApplicationInfo(s,PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        n.setText(pm.getApplicationLabel(applicationInfo));
+        i.setImageDrawable(pm.getApplicationIcon(s));
+        i.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                packagename = s;
+            }
+        });
+    }
 
+    void storeData(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
+        PackageManager pm = getPackageManager();
+        ApplicationInfo app = pm.getApplicationInfo(pname,PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        blockApps.put(pname,new BlockApp(app,hour,min));
+        badApps.add(new Apps(app.loadLabel(pm).toString(), app.loadIcon(pm)));
+        myDialog.dismiss();
+        initReceivedRecyclerView();
+        getPermission();
+    }
+
+    private void getPermission() {
+        AppOpsManager appOps = (AppOpsManager)
+                getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_SYSTEM_ALERT_WINDOW,
+                android.os.Process.myUid(), getPackageName());
+        if(mode == AppOpsManager.MODE_ALLOWED) {
+            startService(new Intent(FrontActivity.this,BackgroundService.class));
+        }
+        else{
+            startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION), MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS){
+            AppOpsManager appOps = (AppOpsManager)
+                    getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(), getPackageName());
+            if(mode == AppOpsManager.MODE_ALLOWED){
+                startService(new Intent(FrontActivity.this,BackgroundService.class));
+            }
+            else{
+                Toast.makeText(FrontActivity.this,"Give that permission." , Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
