@@ -14,6 +14,7 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -36,7 +37,10 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,6 +48,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class FrontActivity extends AppCompatActivity {
 
@@ -51,7 +56,9 @@ public class FrontActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1;
     PackageManager pm;
     ArrayList<Apps> apps = new ArrayList<Apps>();
-    ArrayList<Apps> badApps = new ArrayList<Apps>();
+    ArrayList<Apps> nameList = new ArrayList<Apps>();
+    ArrayList<Apps> badApps = new ArrayList<>();
+    ArrayList<String> tempList;
     RecyclerView recyclerViewApps, recyclerViewAppsGood;
     Activity activity;
     Context context;
@@ -61,6 +68,9 @@ public class FrontActivity extends AppCompatActivity {
     Dialog myDialog,finalDialog;
     String packagename;
     BarData barData;
+
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String BAD_APP_LIST = "nameList";
 
 
     @Override
@@ -87,6 +97,29 @@ public class FrontActivity extends AppCompatActivity {
                 addApps(app);
             }
         }
+
+    SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(BAD_APP_LIST, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        tempList = gson.fromJson(json, type);
+
+        if(tempList == null){
+            tempList = new ArrayList<String>();
+            tempList.clear();
+        }
+
+        for(String pname : tempList){
+             ApplicationInfo app = new ApplicationInfo();
+            try {
+                app = pm.getApplicationInfo(pname, PackageManager.MATCH_UNINSTALLED_PACKAGES);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            badApps.add(new Apps(app.name, app.loadIcon(pm)));
+        }
+
         initReceivedRecyclerView();
     }
 
@@ -117,7 +150,7 @@ public class FrontActivity extends AppCompatActivity {
             Log.d("Aniket",sdf.format(startMillis));
             Log.d("Aniket",sdf.format(endMillis));
             for (UsageStats usageStats : lUsageStatsMap){
-                if("com.whatsapp".equals(usageStats.getPackageName())){
+                if("com.tencent.ig".equals(usageStats.getPackageName())){
                     long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
                     long timeInSec = totalTimeUsageInMillis/1000;
                     float hour = (float) ((timeInSec*1.0)/3600);
@@ -142,7 +175,6 @@ public class FrontActivity extends AppCompatActivity {
     }
 
     public void badAdd(View view) throws PackageManager.NameNotFoundException {
-        getPermission();
         myDialog.setContentView(R.layout.bad_apps_add);
         final ImageView i1 = myDialog.findViewById(R.id.i1);
         final ImageView i2 = myDialog.findViewById(R.id.i2);
@@ -238,9 +270,25 @@ public class FrontActivity extends AppCompatActivity {
     }
 
     private void addBadApps(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
+        getPermission();
         PackageManager pm = getPackageManager();
+
+
+
         ApplicationInfo app = pm.getApplicationInfo(pname,PackageManager.MATCH_UNINSTALLED_PACKAGES);
-        badApps.add(new Apps(app.name,app.loadIcon(pm)));
+        Apps app1 = new Apps(app.name,app.loadIcon(pm));
+        badApps.add(app1);
+
+        tempList.add(pname);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(tempList);
+        editor.putString(BAD_APP_LIST, json);
+        editor.apply();
+
+
         finalDialog.dismiss();
     }
 
@@ -264,7 +312,7 @@ public class FrontActivity extends AppCompatActivity {
         if(requestCode == MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS){
             AppOpsManager appOps = (AppOpsManager)
                     getSystemService(Context.APP_OPS_SERVICE);
-            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_SYSTEM_ALERT_WINDOW,
                     android.os.Process.myUid(), getPackageName());
             if(mode == AppOpsManager.MODE_ALLOWED){
             }
