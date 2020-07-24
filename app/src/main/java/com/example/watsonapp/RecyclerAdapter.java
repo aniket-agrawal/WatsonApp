@@ -24,7 +24,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     private final static String TAG = "Soumil";
 
     Activity activity;
-    ArrayList<Apps> apps = new ArrayList<Apps>();
+    ArrayList<Apps> apps;
     ArrayList<Apps> appsFull;
 
     public RecyclerAdapter(Activity activity, ArrayList<Apps> apps) {
