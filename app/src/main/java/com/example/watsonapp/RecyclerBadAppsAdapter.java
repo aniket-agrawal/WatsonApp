@@ -1,7 +1,17 @@
 package com.example.watsonapp;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +20,17 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -22,13 +40,17 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
     private final static String TAG = "Soumil";
 
     Activity activity;
-    ArrayList<Apps> apps = new ArrayList<Apps>();
+    ArrayList<Apps> apps;
     ArrayList<Apps> appsFull;
+    Dialog finalDialog;
+    String dialogName;
+    BarData barData;
 
     public RecyclerBadAppsAdapter(Activity activity, ArrayList<Apps> apps) {
         this.activity = activity;
         this.apps = apps;
-        appsFull = new ArrayList<Apps>(apps);
+        appsFull = new ArrayList<>(apps);
+        finalDialog = new Dialog(activity);
     }
 
     @NonNull
@@ -57,13 +79,13 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         return apps.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         CircleImageView imageIcon;
         TextView nameApp;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
+        public ViewHolder(@NonNull View view) {
+            super(view);
             imageIcon = itemView.findViewById(R.id.app_icon);
             nameApp = itemView.findViewById(R.id.app_name);
         }
@@ -73,8 +95,15 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
             Apps app = apps.get(position);
             Drawable icon = app.appIcon;
             String name = app.appName;
+            dialogName = name;
             imageIcon.setImageDrawable(icon);
             nameApp.setText(name);
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        public void onClick(View v) {
+            Log.d("Aniket",dialogName);
+            finalAdd();
         }
     }
 
@@ -115,6 +144,55 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
             notifyDataSetChanged();
 
         }
+
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void finalAdd() {
+        finalDialog.setContentView(R.layout.activity_detail_app_usage);
+        final TextView close = finalDialog.findViewById(R.id.txtclose_detail);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finalDialog.dismiss();
+            }
+        });
+        TextView appName = finalDialog.findViewById(R.id.detail_app_name);
+        appName.setText(dialogName);
+        BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
+        barEachApp.setData(usage());
+        finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        finalDialog.show();
+    }
+
+    private BarData usage() {
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
+        Calendar cal = Calendar.getInstance();
+        ArrayList<BarEntry> barEntries = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.MINUTE, 00);
+        cal.set(Calendar.SECOND, 00);
+        for(int i= 17;i < 24;i++){
+            cal.set(Calendar.DAY_OF_MONTH, i);
+            long startMillis = cal.getTimeInMillis();
+            long endMillis = startMillis+3600000;
+            List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,startMillis, endMillis);
+            Log.d("Aniket",sdf.format(startMillis));
+            Log.d("Aniket",sdf.format(endMillis));
+            for (UsageStats usageStats : lUsageStatsMap){
+                if("com.whatsapp".equals(usageStats.getPackageName())){
+                    long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
+                    long timeInSec = totalTimeUsageInMillis/1000;
+                    float hour = (float) ((timeInSec*1.0)/3600);
+                    Log.d(String.valueOf(i), String.valueOf(hour));
+                    barEntries.add(new BarEntry(i,hour));
+                }
+            }
+        }
+        BarDataSet barDataSet = new BarDataSet(barEntries,"usage");
+        barData = new BarData();
+        barData.addDataSet(barDataSet);
+        return barData;
+    }
 }

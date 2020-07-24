@@ -1,6 +1,7 @@
 package com.example.watsonapp;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +18,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -56,9 +58,10 @@ public class FrontActivity extends AppCompatActivity {
     long startMillis;
     long endMillis;
     BarChart barChart;
-    Dialog myDialog;
+    Dialog myDialog,finalDialog;
     String packagename;
-    HashMap<String,BlockApp> blockApps = new HashMap<String,BlockApp>();;
+    HashMap<String,BlockApp> blockApps = new HashMap<>();
+    BarData barData;
 
 
     @Override
@@ -67,6 +70,7 @@ public class FrontActivity extends AppCompatActivity {
         setContentView(R.layout.activity_front);
         barChart = findViewById(R.id.graph_usage);
         myDialog = new Dialog(this);
+        finalDialog = new Dialog(this);
         pm = getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         activity = this;
@@ -74,8 +78,8 @@ public class FrontActivity extends AppCompatActivity {
         apps.clear();
         badApps.clear();
         usage();
-        recyclerViewApps = (RecyclerView)findViewById(R.id.recycler_view_show_icons);
-        recyclerViewAppsGood = (RecyclerView)findViewById(R.id.recycler_view_show_icons_good);
+        recyclerViewApps = findViewById(R.id.recycler_view_show_icons);
+        recyclerViewAppsGood = findViewById(R.id.recycler_view_show_icons_good);
         for(ApplicationInfo app : packages) {
             if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
                 addApps(app);
@@ -124,7 +128,7 @@ public class FrontActivity extends AppCompatActivity {
             }
         }
         BarDataSet barDataSet = new BarDataSet(barEntries,"usage");
-        BarData barData = new BarData();
+        barData = new BarData();
         barData.addDataSet(barDataSet);
         barChart.setData(barData);
 
@@ -132,14 +136,6 @@ public class FrontActivity extends AppCompatActivity {
 
     public void addApps(ApplicationInfo app){
         try {
-//            long totalTimeUsageInMillis = lUsageStatsMap.get(app.packageName).
-//                    getTotalTimeInForeground();
-//            long timeInSec = totalTimeUsageInMillis / 1000;
-//            long hour = timeInSec / 3600;
-//            long min = (timeInSec - (hour * 3600)) / 60;
-//            if (hour!=0 || min!=0) {
-//
-//            }
             apps.add(new Apps(app.loadLabel(pm).toString(), app.loadIcon(pm)));
         } catch (Exception e) {
             Log.d("Soumil", app.packageName);
@@ -147,10 +143,8 @@ public class FrontActivity extends AppCompatActivity {
     }
 
     public void badAdd(View view) throws PackageManager.NameNotFoundException {
+        getPermission();
         myDialog.setContentView(R.layout.bad_apps_add);
-        TextView txtclose;
-        final EditText hour = myDialog.findViewById(R.id.hour);
-        final EditText min = myDialog.findViewById(R.id.min);
         final ImageView i1 = myDialog.findViewById(R.id.i1);
         final ImageView i2 = myDialog.findViewById(R.id.i2);
         final ImageView i3 = myDialog.findViewById(R.id.i3);
@@ -166,23 +160,14 @@ public class FrontActivity extends AppCompatActivity {
         setApp(i3,n3,"com.facebook.katana");
         setApp(i4,n4,"com.tencent.ig");
         setApp(i5,n5,"com.ludo.king");
-        txtclose =(TextView) myDialog.findViewById(R.id.txtclose);
-        txtclose.setText("X");
-        Button button = myDialog.findViewById(R.id.add);
-        txtclose.setOnClickListener(new View.OnClickListener() {
+        final ImageView i6 = myDialog.findViewById(R.id.i6);
+        i6.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent badAppsIntent = new Intent(FrontActivity.this, BadAppsActivity.class);
+                startActivity(badAppsIntent);
                 myDialog.dismiss();
-            }
-        });
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    storeData(packagename,Integer.parseInt(hour.getText().toString()),Integer.parseInt(min.getText().toString()));
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                }
+                finish();
             }
         });
         myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -207,22 +192,39 @@ public class FrontActivity extends AppCompatActivity {
         n.setText(pm.getApplicationLabel(applicationInfo));
         i.setImageDrawable(pm.getApplicationIcon(s));
         i.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View v) {
                 packagename = s;
+                finalAdd();
             }
         });
     }
 
-    void storeData(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
-        PackageManager pm = getPackageManager();
-        ApplicationInfo app = pm.getApplicationInfo(pname,PackageManager.MATCH_UNINSTALLED_PACKAGES);
-        blockApps.put(pname,new BlockApp(app,hour,min));
-        badApps.add(new Apps(app.loadLabel(pm).toString(), app.loadIcon(pm)));
-        myDialog.dismiss();
-        initReceivedRecyclerView();
-        getPermission();
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void finalAdd() {
+        finalDialog.setContentView(R.layout.activity_detail_app_usage);
+        final TextView close = finalDialog.findViewById(R.id.txtclose_detail);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finalDialog.dismiss();
+            }
+        });
+        TextView appName = finalDialog.findViewById(R.id.detail_app_name);
+        ApplicationInfo applicationInfo = new ApplicationInfo();
+        try {
+            applicationInfo = pm.getApplicationInfo(packagename,PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        appName.setText(pm.getApplicationLabel(applicationInfo));
+        BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
+        barEachApp.setData(barData);
+        finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        finalDialog.show();
     }
+
 
     private void getPermission() {
         AppOpsManager appOps = (AppOpsManager)
@@ -230,7 +232,6 @@ public class FrontActivity extends AppCompatActivity {
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_SYSTEM_ALERT_WINDOW,
                 android.os.Process.myUid(), getPackageName());
         if(mode == AppOpsManager.MODE_ALLOWED) {
-            startService(new Intent(FrontActivity.this,BackgroundService.class));
         }
         else{
             startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION), MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
@@ -247,7 +248,6 @@ public class FrontActivity extends AppCompatActivity {
             int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
                     android.os.Process.myUid(), getPackageName());
             if(mode == AppOpsManager.MODE_ALLOWED){
-                startService(new Intent(FrontActivity.this,BackgroundService.class));
             }
             else{
                 Toast.makeText(FrontActivity.this,"Give that permission." , Toast.LENGTH_SHORT).show();

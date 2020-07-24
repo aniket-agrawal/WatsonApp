@@ -49,6 +49,7 @@ public class BackgroundService extends Service {
                                   },
                 0, 1000);
     }
+
     private void block(){
         if(printForegroundTask().equals("com.whatsapp")){
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
