@@ -79,7 +79,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         return apps.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         CircleImageView imageIcon;
         TextView nameApp;
@@ -88,6 +88,12 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
             super(view);
             imageIcon = itemView.findViewById(R.id.app_icon);
             nameApp = itemView.findViewById(R.id.app_name);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finalAdd();
+                }
+            });
         }
 
         public void bindView(int position)
@@ -98,12 +104,6 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
             dialogName = name;
             imageIcon.setImageDrawable(icon);
             nameApp.setText(name);
-        }
-
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        public void onClick(View v) {
-            Log.d("Aniket",dialogName);
-            finalAdd();
         }
     }
 
@@ -147,7 +147,6 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
 
     };
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void finalAdd() {
         finalDialog.setContentView(R.layout.activity_detail_app_usage);
         final TextView close = finalDialog.findViewById(R.id.txtclose_detail);
