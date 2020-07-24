@@ -60,7 +60,6 @@ public class FrontActivity extends AppCompatActivity {
     BarChart barChart;
     Dialog myDialog,finalDialog;
     String packagename;
-    HashMap<String,BlockApp> blockApps = new HashMap<>();
     BarData barData;
 
 
@@ -218,11 +217,31 @@ public class FrontActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+        final TextView hour = finalDialog.findViewById(R.id.hour);
+        final TextView min = finalDialog.findViewById(R.id.min);
+        Button add = finalDialog.findViewById(R.id.add);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    addBadApps(packagename,Integer.parseInt(hour.getText().toString()),Integer.parseInt(min.getText().toString()));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         appName.setText(pm.getApplicationLabel(applicationInfo));
         BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
         barEachApp.setData(barData);
         finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         finalDialog.show();
+    }
+
+    private void addBadApps(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
+        PackageManager pm = getPackageManager();
+        ApplicationInfo app = pm.getApplicationInfo(pname,PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        badApps.add(new Apps(app.name,app.loadIcon(pm)));
+        finalDialog.dismiss();
     }
 
 
