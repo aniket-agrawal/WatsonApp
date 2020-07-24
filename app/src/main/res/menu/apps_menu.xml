@@ -8,4 +8,13 @@
     app:showAsAction="ifRoom|collapseActionView"
     app:actionViewClass="androidx.appcompat.widget.SearchView"
     />
+
+    <item
+        android:id="@+id/back_button"
+        android:icon="@drawable/backbutton"
+        android:title="Back"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.widget.Button"
+        />
+
 </menu>
