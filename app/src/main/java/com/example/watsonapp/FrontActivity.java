@@ -59,6 +59,7 @@ public class FrontActivity extends AppCompatActivity {
     ArrayList<Apps> nameList = new ArrayList<Apps>();
     ArrayList<Apps> badApps = new ArrayList<>();
     ArrayList<String> tempList;
+    ArrayList<Integer> hourList,minList;
     ArrayList<String> tempListGood;
     RecyclerView recyclerViewApps, recyclerViewAppsGood;
     Activity activity;
@@ -95,14 +96,7 @@ public class FrontActivity extends AppCompatActivity {
         recyclerViewApps = findViewById(R.id.recycler_view_show_icons);
         recyclerViewAppsGood = findViewById(R.id.recycler_view_show_icons_good);
 
-//        for(ApplicationInfo app : packages) {
-//            if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
-//                addApps(app);
-//            } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-//            } else {
-//                addApps(app);
-//            }
-//        }
+
 
     SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
@@ -111,20 +105,32 @@ public class FrontActivity extends AppCompatActivity {
 
         String json = sharedPreferences.getString(BAD_APP_LIST, null);
         String json1 = sharedPreferences.getString(GOOD_APP_LIST, null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        tempList = gson.fromJson(json, type);
-        tempListGood = gson.fromJson(json1, type);
+        String jsh = sharedPreferences.getString(USAGE_HOUR,null);
+        String jsm = sharedPreferences.getString(USAGE_MIN,null);
+        Type typer = new TypeToken<ArrayList<String>>() {}.getType();
+        Type type1 = new TypeToken<ArrayList<Integer>>(){}.getType();
+        tempList = gson.fromJson(json, typer);
+        tempListGood = gson.fromJson(json1, typer);
+        hourList = gson.fromJson(jsh,type1);
+        minList = gson.fromJson(jsm,type1);
 
         if(tempList == null){
             tempList = new ArrayList<String>();
             tempList.clear();
         }
-
-
+        if(hourList == null){
+            hourList = new ArrayList<Integer>();
+            hourList.clear();
+        }
+        if(minList == null){
+            minList = new ArrayList<Integer>();
+            minList.clear();
+        }
          if(tempListGood == null){
              tempListGood = new ArrayList<String>();
              tempListGood.clear();
          }
+        int i = 0;
         for(String pname : tempList){
              ApplicationInfo app = new ApplicationInfo();
             try {
@@ -133,7 +139,8 @@ public class FrontActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            badApps.add(new Apps((String) app.loadLabel(pm), app.loadIcon(pm),app.packageName));
+            badApps.add(new Apps((String) app.loadLabel(pm), app.loadIcon(pm),app.packageName,hourList.get(i),minList.get(i)));
+            i++;
         }
 
         for(String pname1 : tempListGood){
@@ -272,8 +279,8 @@ public class FrontActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        final TextView hour = finalDialog.findViewById(R.id.hour);
-        final TextView min = finalDialog.findViewById(R.id.min);
+        final EditText hour = finalDialog.findViewById(R.id.hour);
+        final EditText min = finalDialog.findViewById(R.id.min);
         Button add = finalDialog.findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -302,12 +309,16 @@ public class FrontActivity extends AppCompatActivity {
         badApps.add(app1);
 
         tempList.add(pname);
+        hourList.add(hour);
+        minList.add(min);
 
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(tempList);
+        String jsh = gson.toJson(hourList);
         editor.putString(BAD_APP_LIST, json);
+        editor.putString(USAGE_HOUR, jsh);
         editor.apply();
 
 

@@ -52,7 +52,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     ArrayList<Apps> apps;
     ArrayList<Apps> appsFull;
     Dialog finalDialog;
-    String dialogName;
+    ArrayList<Integer> hourList,minList;
     BarData barData;
     int type;
     ArrayList<String> tempList;
@@ -139,6 +139,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             e.printStackTrace();
         }
         Button add = finalDialog.findViewById(R.id.add);
+        TextView hour = finalDialog.findViewById(R.id.hour);
+        TextView min = finalDialog.findViewById(R.id.min);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
