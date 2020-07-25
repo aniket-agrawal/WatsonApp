@@ -36,6 +36,7 @@ public class SplashActivity extends AppCompatActivity {
                     finish();
                 }
                 else {
+                    startService(new Intent(SplashActivity.this,BackgroundService.class));
                     startActivity(new Intent(SplashActivity.this,FrontActivity.class));
                     finish();
                 }

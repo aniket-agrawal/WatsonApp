@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,5 +27,10 @@ public class Block extends AppCompatActivity {
         } else {
             v.vibrate(5000);
         }
+    }
+
+    public void Front(View view) {
+        startActivity(new Intent(Block.this,FrontActivity.class));
+        finish();
     }
 }

@@ -66,7 +66,7 @@ public class BadAppsActivity extends AppCompatActivity {
 //            if (hour!=0 || min!=0) {
 //
 //            }
-            apps.add(new Apps(app.loadLabel(pm).toString(), app.loadIcon(pm)));
+            apps.add(new Apps(app.loadLabel(pm).toString(), app.loadIcon(pm),app.packageName));
         } catch (Exception e) {
             Log.d("Soumil", app.packageName);
         }
