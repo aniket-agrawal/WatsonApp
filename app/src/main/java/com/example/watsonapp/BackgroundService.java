@@ -45,16 +45,6 @@ public class BackgroundService extends Service {
     public void onCreate() {
         super.onCreate();
         System.out.println("ANIKET");
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString(BAD_APP_LIST, null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        tempList = gson.fromJson(json, type);
-
-        if(tempList == null){
-            tempList = new ArrayList<String>();
-            tempList.clear();
-        }
         blockIntent = new Intent(this,Block.class);
         blockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startTimer();
@@ -72,8 +62,17 @@ public class BackgroundService extends Service {
     }
 
     private void block(){
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(BAD_APP_LIST, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        tempList = gson.fromJson(json, type);
+
+        if(tempList == null){
+            tempList = new ArrayList<String>();
+            tempList.clear();
+        }
         if(tempList.contains(printForegroundTask())){
-            Log.d("Soumil", "Blocking");
             Intent myIntent = new Intent(BackgroundService.this,Block.class);
             myIntent.addCategory(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
             myIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
