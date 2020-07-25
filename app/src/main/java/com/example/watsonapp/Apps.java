@@ -9,6 +9,7 @@ public class Apps{
     public String appName;
     public Drawable appIcon;
     public String pname;
+    public int hour,min;
 
     public Apps(long appUsage, String appName, Drawable appIcon){
         this.appUsage = appUsage;
@@ -20,11 +21,18 @@ public class Apps{
         this.appName = appName;
     }
 
-
     public Apps(String appName, Drawable appIcon,String pname){
         this.appIcon = appIcon;
         this.appName = appName;
         this.pname = pname;
+    }
+
+    public Apps(String appName, Drawable appIcon,String pname, int hour, int min){
+        this.appIcon = appIcon;
+        this.appName = appName;
+        this.pname = pname;
+        this.hour = hour;
+        this.min = min;
     }
 
     public static Comparator<Apps> appTime = new Comparator<Apps>() {
