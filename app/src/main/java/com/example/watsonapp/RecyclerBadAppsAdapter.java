@@ -47,6 +47,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.watsonapp.FrontActivity.BAD_APP_LIST;
+import static com.example.watsonapp.FrontActivity.GOOD_APP_LIST;
 import static com.example.watsonapp.FrontActivity.SHARED_PREFS;
 
 public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadAppsAdapter.ViewHolder> implements Filterable {
@@ -169,21 +170,8 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
     };
 
     private void finalAdd(final String packagename) {
-        /*finalDialog.setContentView(R.layout.activity_detail_app_usage);
-        final TextView close = finalDialog.findViewById(R.id.txtclose_detail);
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finalDialog.dismiss();
-            }
-        });
-        TextView appName = finalDialog.findViewById(R.id.detail_app_name);
-        appName.setText(dialogName);
-        BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
-        barEachApp.setData(usage());
-        finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        finalDialog.show();*/
-        finalDialog.setContentView(R.layout.activity_detail_app_usage);
+        if(type==0) finalDialog.setContentView(R.layout.activity_detail_app_usage);
+        else finalDialog.setContentView(R.layout.good_app_add);
         final TextView close = finalDialog.findViewById(R.id.txtclose_detail);
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,25 +186,33 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        final TextView hour = finalDialog.findViewById(R.id.hour);
-        final TextView min = finalDialog.findViewById(R.id.min);
-        Button add = finalDialog.findViewById(R.id.add);
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    addBadApps(packagename,Integer.parseInt(hour.getText().toString()),Integer.parseInt(min.getText().toString()));
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
+        if(type==0) {
+            final TextView hour = finalDialog.findViewById(R.id.hour);
+            final TextView min = finalDialog.findViewById(R.id.min);
+            Button add = finalDialog.findViewById(R.id.add);
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addBadApps(packagename, Integer.parseInt(hour.getText().toString()), Integer.parseInt(min.getText().toString()));
                 }
-            }
-        });
+            });
+        }
+        else {
+            Button add = finalDialog.findViewById(R.id.add);
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addGoodApps(packagename);
+                }
+            });
+        }
         appName.setText(activity.getPackageManager().getApplicationLabel(applicationInfo));
         BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
         barEachApp.setData(usage(packagename));
         finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         finalDialog.show();
     }
+
 
     private BarData usage(String packagename) {
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
@@ -246,12 +242,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         return barData;
     }
 
-    private void addBadApps(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
-        PackageManager pm = activity.getPackageManager();
-
-
-
-        ApplicationInfo app = pm.getApplicationInfo(pname,PackageManager.MATCH_UNINSTALLED_PACKAGES);
+    private void addBadApps(String pname, int hour, int min) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString(BAD_APP_LIST, null);
@@ -275,5 +266,28 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         finalDialog.dismiss();
     }
 
+    private void addGoodApps(String pname) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(GOOD_APP_LIST, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        tempList = gson.fromJson(json, type);
+
+        if(tempList == null){
+            tempList = new ArrayList<String>();
+            tempList.clear();
+        }
+        tempList.add(pname);
+
+        SharedPreferences sharedPreferences1 = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences1.edit();
+        Gson gson1 = new Gson();
+        String json1 = gson1.toJson(tempList);
+        editor.putString(GOOD_APP_LIST, json1);
+        editor.apply();
+
+
+        finalDialog.dismiss();
+    }
 
 }

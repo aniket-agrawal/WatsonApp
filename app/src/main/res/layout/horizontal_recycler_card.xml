@@ -30,7 +30,22 @@
                 android:layout_centerHorizontal="true"
                 android:id="@+id/icon_image_card"
                 android:src="@drawable/ic_launcher_background"/>
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:text="App Name"
+                android:id="@+id/card_app_package_name"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:layout_below="@+id/icon_image_card"
+                android:layout_marginTop="5dp"
+                android:textColor="#000"
+                android:visibility="invisible"
+                android:layout_marginBottom="5dp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="8sp"
+                android:autoSizeMaxTextSize="15sp"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
@@ -46,6 +61,7 @@
                 android:autoSizeMinTextSize="8sp"
                 android:autoSizeMaxTextSize="15sp"
                 />
+
 
         </RelativeLayout>
 

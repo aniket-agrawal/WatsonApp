@@ -133,7 +133,7 @@ public class FrontActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            badApps.add(new Apps(app.name, app.loadIcon(pm)));
+            badApps.add(new Apps((String) app.loadLabel(pm), app.loadIcon(pm),app.packageName));
         }
 
         for(String pname1 : tempListGood){
@@ -144,15 +144,15 @@ public class FrontActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            apps.add(new Apps(app.name, app.loadIcon(pm)));
+            apps.add(new Apps((String) app.loadLabel(pm), app.loadIcon(pm),app.packageName));
         }
 
         initReceivedRecyclerView();
     }
 
     private void initReceivedRecyclerView(){
-        RecyclerAdapter listAdapter = new RecyclerAdapter(activity,apps);
-        RecyclerAdapter listAdapter1 = new RecyclerAdapter(activity,badApps);
+        RecyclerAdapter listAdapter = new RecyclerAdapter(activity,apps,1);
+        RecyclerAdapter listAdapter1 = new RecyclerAdapter(activity,badApps,0);
         recyclerViewApps.setAdapter(listAdapter1);
         recyclerViewAppsGood.setAdapter(listAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -192,13 +192,6 @@ public class FrontActivity extends AppCompatActivity {
         return barData;
     }
 
-    public void addApps(ApplicationInfo app){
-        try {
-            apps.add(new Apps(app.loadLabel(pm).toString(), app.loadIcon(pm)));
-        } catch (Exception e) {
-            Log.d("Soumil", app.packageName);
-        }
-    }
 
     public void badAdd(View view) throws PackageManager.NameNotFoundException {
         getPermission();
@@ -305,7 +298,7 @@ public class FrontActivity extends AppCompatActivity {
 
 
         ApplicationInfo app = pm.getApplicationInfo(pname,PackageManager.MATCH_UNINSTALLED_PACKAGES);
-        Apps app1 = new Apps(app.name,app.loadIcon(pm));
+        Apps app1 = new Apps((String) app.loadLabel(pm),app.loadIcon(pm),app.packageName);
         badApps.add(app1);
 
         tempList.add(pname);

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="370dp"
-    android:layout_height="500dp"
+    android:layout_height="420dp"
     android:background="@color/bluelight"
     android:padding="5dp"
     android:layout_gravity="center">
@@ -72,14 +72,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:orientation="horizontal">
-        <EditText
-            android:layout_gravity="center"
+        <TextView
             android:id="@+id/hour"
+            android:layout_gravity="center"
             android:layout_width="100dp"
             android:layout_height="40dp"
             android:textColor="#ffffff"
-            android:gravity="center"
+            android:text="0"
             android:textAlignment="center"
+            android:gravity="center"
             android:inputType="number"/>
 
         <TextView
@@ -91,11 +92,12 @@
             android:textSize="20dp"
             android:gravity="center"/>
 
-        <EditText
+        <TextView
             android:layout_marginLeft="45dp"
             android:layout_gravity="center"
             android:id="@+id/min"
             android:layout_width="100dp"
+            android:text="0"
             android:gravity="center"
             android:layout_height="40dp"
             android:textColor="#ffffff"
@@ -112,51 +114,6 @@
             android:gravity="center"/>
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="OR"
-        android:textStyle="bold"
-        android:layout_marginTop="4dp"
-        android:textAlignment="center"
-        android:textSize="15sp"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:textColor="#ffffff"
-            android:gravity="center"
-            android:padding="6dp"
-            android:textStyle="bold"
-            android:text="Time Limit in Percentage %"/>
-
-        <EditText
-            android:layout_gravity="center"
-            android:id="@+id/percentage_usage"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:textColor="#ffffff"
-            android:textAlignment="center"
-            android:inputType="number"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="25sp"
-            android:padding="2dp"
-            android:textStyle="bold"
-            android:text="%"
-            />
-    </LinearLayout>
     <Button
         android:id="@+id/add"
         android:layout_width="wrap_content"
@@ -164,6 +121,6 @@
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:background="@drawable/buttons"
-        android:text="   add selected app   "/>
+        android:text="   Delete selected app   "/>
 
 </LinearLayout>
