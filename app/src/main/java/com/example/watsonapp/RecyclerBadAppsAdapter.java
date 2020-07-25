@@ -61,10 +61,12 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
     String dialogName;
     BarData barData;
     ArrayList<String> tempList;
+    int type;
 
-    public RecyclerBadAppsAdapter(Activity activity, ArrayList<Apps> apps) {
+    public RecyclerBadAppsAdapter(Activity activity, ArrayList<Apps> apps, int type) {
         this.activity = activity;
         this.apps = apps;
+        this.type = type;
         appsFull = new ArrayList<>(apps);
         finalDialog = new Dialog(activity);
     }

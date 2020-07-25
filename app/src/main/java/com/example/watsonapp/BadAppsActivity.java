@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class BadAppsActivity extends AppCompatActivity {
     RecyclerView recyclerViewBadApps;
     Activity activity;
     RecyclerBadAppsAdapter listAdapter;
+    int type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,9 @@ public class BadAppsActivity extends AppCompatActivity {
         apps.clear();
         recyclerViewBadApps = (RecyclerView)findViewById(R.id.bad_apps_recycler);
 
+        Intent intent = getIntent();
+        type = intent.getIntExtra("type", 0);
+
         for(ApplicationInfo app : packages) {
             if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
                 addApps(app);
@@ -47,10 +52,12 @@ public class BadAppsActivity extends AppCompatActivity {
             }
         }
         initReceivedRecyclerView();
+
+        Log.d(TAG, String.valueOf(type));
     }
 
     private void initReceivedRecyclerView(){
-        listAdapter  = new RecyclerBadAppsAdapter(activity,apps);
+        listAdapter  = new RecyclerBadAppsAdapter(activity,apps,type);
         recyclerViewBadApps.setAdapter(listAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         recyclerViewBadApps.setLayoutManager(layoutManager);
