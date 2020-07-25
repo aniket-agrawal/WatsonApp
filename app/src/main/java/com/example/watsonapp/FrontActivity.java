@@ -189,7 +189,7 @@ public class FrontActivity extends AppCompatActivity {
         setApp(i1,n1,"com.whatsapp");
         setApp(i2,n2,"com.instagram.android");
         setApp(i3,n3,"com.facebook.katana");
-        setApp(i4,n4,"com.tencent.ig");
+        setApp(i4,n4,"com.example.login");
         setApp(i5,n5,"com.ludo.king");
         final ImageView i6 = myDialog.findViewById(R.id.i6);
         i6.setOnClickListener(new View.OnClickListener() {
