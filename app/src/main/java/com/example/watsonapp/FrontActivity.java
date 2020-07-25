@@ -59,6 +59,7 @@ public class FrontActivity extends AppCompatActivity {
     ArrayList<Apps> nameList = new ArrayList<Apps>();
     ArrayList<Apps> badApps = new ArrayList<>();
     ArrayList<String> tempList;
+    ArrayList<String> tempListGood;
     RecyclerView recyclerViewApps, recyclerViewAppsGood;
     Activity activity;
     Context context;
@@ -68,9 +69,13 @@ public class FrontActivity extends AppCompatActivity {
     Dialog myDialog,finalDialog;
     String packagename;
     BarData barData;
+    int type;
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String BAD_APP_LIST = "nameList";
+    public static final String GOOD_APP_LIST = "nameListGood";
+    public static final String USAGE_HOUR = "hour";
+    public static final String USAGE_MIN = "min";
 
 
     @Override
@@ -89,26 +94,37 @@ public class FrontActivity extends AppCompatActivity {
         barChart.setData(usage("com.whatsapp"));
         recyclerViewApps = findViewById(R.id.recycler_view_show_icons);
         recyclerViewAppsGood = findViewById(R.id.recycler_view_show_icons_good);
-        for(ApplicationInfo app : packages) {
-            if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
-                addApps(app);
-            } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-            } else {
-                addApps(app);
-            }
-        }
+
+//        for(ApplicationInfo app : packages) {
+//            if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
+//                addApps(app);
+//            } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+//            } else {
+//                addApps(app);
+//            }
+//        }
 
     SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
+
+
+
         String json = sharedPreferences.getString(BAD_APP_LIST, null);
+        String json1 = sharedPreferences.getString(GOOD_APP_LIST, null);
         Type type = new TypeToken<ArrayList<String>>() {}.getType();
         tempList = gson.fromJson(json, type);
+        tempListGood = gson.fromJson(json1, type);
 
         if(tempList == null){
             tempList = new ArrayList<String>();
             tempList.clear();
         }
 
+
+         if(tempListGood == null){
+             tempListGood = new ArrayList<String>();
+             tempListGood.clear();
+         }
         for(String pname : tempList){
              ApplicationInfo app = new ApplicationInfo();
             try {
@@ -118,6 +134,17 @@ public class FrontActivity extends AppCompatActivity {
             }
 
             badApps.add(new Apps(app.name, app.loadIcon(pm)));
+        }
+
+        for(String pname1 : tempListGood){
+            ApplicationInfo app = new ApplicationInfo();
+            try {
+                app = pm.getApplicationInfo(pname1, PackageManager.MATCH_UNINSTALLED_PACKAGES);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            apps.add(new Apps(app.name, app.loadIcon(pm)));
         }
 
         initReceivedRecyclerView();
@@ -175,6 +202,7 @@ public class FrontActivity extends AppCompatActivity {
 
     public void badAdd(View view) throws PackageManager.NameNotFoundException {
         getPermission();
+        type = 0;
         myDialog.setContentView(R.layout.bad_apps_add);
         final ImageView i1 = myDialog.findViewById(R.id.i1);
         final ImageView i2 = myDialog.findViewById(R.id.i2);
@@ -196,6 +224,7 @@ public class FrontActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent badAppsIntent = new Intent(FrontActivity.this, BadAppsActivity.class);
+                badAppsIntent.putExtra("type", type);
                 startActivity(badAppsIntent);
                 myDialog.dismiss();
                 finish();
@@ -207,7 +236,9 @@ public class FrontActivity extends AppCompatActivity {
 
 
     public void goodAdd(View view) {
+        type = 1;
         Intent badAppsIntent = new Intent(FrontActivity.this, BadAppsActivity.class);
+        badAppsIntent.putExtra("type", type);
         startActivity(badAppsIntent);
         finish();
     }
