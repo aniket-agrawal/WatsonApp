@@ -86,7 +86,7 @@ public class FrontActivity extends AppCompatActivity {
         context = getApplicationContext();
         apps.clear();
         badApps.clear();
-        usage();
+        barChart.setData(usage("com.whatsapp"));
         recyclerViewApps = findViewById(R.id.recycler_view_show_icons);
         recyclerViewAppsGood = findViewById(R.id.recycler_view_show_icons_good);
         for(ApplicationInfo app : packages) {
@@ -134,7 +134,7 @@ public class FrontActivity extends AppCompatActivity {
         recyclerViewAppsGood.setLayoutManager(layoutManagerGood);
     }
 
-    void usage() {
+    BarData usage(String pack) {
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar cal = Calendar.getInstance();
         ArrayList<BarEntry> barEntries = new ArrayList<>();
@@ -150,7 +150,7 @@ public class FrontActivity extends AppCompatActivity {
             Log.d("Aniket",sdf.format(startMillis));
             Log.d("Aniket",sdf.format(endMillis));
             for (UsageStats usageStats : lUsageStatsMap){
-                if("com.tencent.ig".equals(usageStats.getPackageName())){
+                if(pack.equals(usageStats.getPackageName())){
                     long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
                     long timeInSec = totalTimeUsageInMillis/1000;
                     float hour = (float) ((timeInSec*1.0)/3600);
@@ -162,8 +162,7 @@ public class FrontActivity extends AppCompatActivity {
         BarDataSet barDataSet = new BarDataSet(barEntries,"usage");
         barData = new BarData();
         barData.addDataSet(barDataSet);
-        barChart.setData(barData);
-
+        return barData;
     }
 
     public void addApps(ApplicationInfo app){
@@ -175,6 +174,7 @@ public class FrontActivity extends AppCompatActivity {
     }
 
     public void badAdd(View view) throws PackageManager.NameNotFoundException {
+        getPermission();
         myDialog.setContentView(R.layout.bad_apps_add);
         final ImageView i1 = myDialog.findViewById(R.id.i1);
         final ImageView i2 = myDialog.findViewById(R.id.i2);
@@ -232,7 +232,6 @@ public class FrontActivity extends AppCompatActivity {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void finalAdd() {
         finalDialog.setContentView(R.layout.activity_detail_app_usage);
         final TextView close = finalDialog.findViewById(R.id.txtclose_detail);
@@ -264,13 +263,12 @@ public class FrontActivity extends AppCompatActivity {
         });
         appName.setText(pm.getApplicationLabel(applicationInfo));
         BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
-        barEachApp.setData(barData);
+        barEachApp.setData(usage(packagename));
         finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         finalDialog.show();
     }
 
     private void addBadApps(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
-        getPermission();
         PackageManager pm = getPackageManager();
 
 

@@ -1,25 +1,32 @@
 package com.example.watsonapp;
 
 import android.app.Activity;
+import android.app.AppOpsManager;
 import android.app.Dialog;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +34,10 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,9 +45,14 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.content.Context.MODE_PRIVATE;
+import static com.example.watsonapp.FrontActivity.BAD_APP_LIST;
+import static com.example.watsonapp.FrontActivity.SHARED_PREFS;
+
 public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadAppsAdapter.ViewHolder> implements Filterable {
 
     private final static String TAG = "Soumil";
+    private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1;
 
     Activity activity;
     ArrayList<Apps> apps;
@@ -45,6 +60,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
     Dialog finalDialog;
     String dialogName;
     BarData barData;
+    ArrayList<String> tempList;
 
     public RecyclerBadAppsAdapter(Activity activity, ArrayList<Apps> apps) {
         this.activity = activity;
@@ -83,15 +99,17 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
 
         CircleImageView imageIcon;
         TextView nameApp;
+        TextView pname;
 
         public ViewHolder(@NonNull View view) {
             super(view);
-            imageIcon = itemView.findViewById(R.id.app_icon);
-            nameApp = itemView.findViewById(R.id.app_name);
+            imageIcon = view.findViewById(R.id.app_icon);
+            pname = view.findViewById(R.id.app_package);
+            nameApp = view.findViewById(R.id.app_name);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    finalAdd();
+                    finalAdd(pname.getText().toString());
                 }
             });
         }
@@ -104,6 +122,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
             dialogName = name;
             imageIcon.setImageDrawable(icon);
             nameApp.setText(name);
+            pname.setText(app.pname);
         }
     }
 
@@ -147,8 +166,8 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
 
     };
 
-    private void finalAdd() {
-        finalDialog.setContentView(R.layout.activity_detail_app_usage);
+    private void finalAdd(final String packagename) {
+        /*finalDialog.setContentView(R.layout.activity_detail_app_usage);
         final TextView close = finalDialog.findViewById(R.id.txtclose_detail);
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,10 +180,43 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
         barEachApp.setData(usage());
         finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        finalDialog.show();*/
+        finalDialog.setContentView(R.layout.activity_detail_app_usage);
+        final TextView close = finalDialog.findViewById(R.id.txtclose_detail);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finalDialog.dismiss();
+            }
+        });
+        TextView appName = finalDialog.findViewById(R.id.detail_app_name);
+        ApplicationInfo applicationInfo = new ApplicationInfo();
+        try {
+            applicationInfo = activity.getPackageManager().getApplicationInfo(packagename,PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        final TextView hour = finalDialog.findViewById(R.id.hour);
+        final TextView min = finalDialog.findViewById(R.id.min);
+        Button add = finalDialog.findViewById(R.id.add);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    addBadApps(packagename,Integer.parseInt(hour.getText().toString()),Integer.parseInt(min.getText().toString()));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        appName.setText(activity.getPackageManager().getApplicationLabel(applicationInfo));
+        BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
+        barEachApp.setData(usage(packagename));
+        finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         finalDialog.show();
     }
 
-    private BarData usage() {
+    private BarData usage(String packagename) {
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar cal = Calendar.getInstance();
         ArrayList<BarEntry> barEntries = new ArrayList<>();
@@ -177,14 +229,11 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
             long startMillis = cal.getTimeInMillis();
             long endMillis = startMillis+3600000;
             List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,startMillis, endMillis);
-            Log.d("Aniket",sdf.format(startMillis));
-            Log.d("Aniket",sdf.format(endMillis));
             for (UsageStats usageStats : lUsageStatsMap){
-                if("com.whatsapp".equals(usageStats.getPackageName())){
+                if(packagename.equals(usageStats.getPackageName())){
                     long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
                     long timeInSec = totalTimeUsageInMillis/1000;
                     float hour = (float) ((timeInSec*1.0)/3600);
-                    Log.d(String.valueOf(i), String.valueOf(hour));
                     barEntries.add(new BarEntry(i,hour));
                 }
             }
@@ -194,4 +243,35 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         barData.addDataSet(barDataSet);
         return barData;
     }
+
+    private void addBadApps(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
+        PackageManager pm = activity.getPackageManager();
+
+
+
+        ApplicationInfo app = pm.getApplicationInfo(pname,PackageManager.MATCH_UNINSTALLED_PACKAGES);
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(BAD_APP_LIST, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        tempList = gson.fromJson(json, type);
+
+        if(tempList == null){
+            tempList = new ArrayList<String>();
+            tempList.clear();
+        }
+        tempList.add(pname);
+
+        SharedPreferences sharedPreferences1 = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences1.edit();
+        Gson gson1 = new Gson();
+        String json1 = gson1.toJson(tempList);
+        editor.putString(BAD_APP_LIST, json1);
+        editor.apply();
+
+
+        finalDialog.dismiss();
+    }
+
+
 }
