@@ -34,7 +34,13 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        zoom();
+        Intent intent = getIntent();
+        int a = intent.getIntExtra("A", 0);
+        if (a == 1) {
+            startActivity(new Intent(SplashActivity.this, Block.class));
+            finish();
+        } else {
+            zoom();
         /*SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
 
@@ -51,22 +57,22 @@ public class SplashActivity extends AppCompatActivity {
         editor.putString(USAGE_MIN, json1);
         editor.putString(USAGE_HOUR, json1);
         editor.apply();*/
-        mAuth = FirebaseAuth.getInstance();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(mAuth.getCurrentUser()==null) {
-                    Intent i = new Intent(SplashActivity.this, SignInUpActivity.class);
-                    startActivity(i);
-                    finish();
+            mAuth = FirebaseAuth.getInstance();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startService(new Intent(SplashActivity.this, BackgroundService.class));
+                    if (mAuth.getCurrentUser() == null) {
+                        Intent i = new Intent(SplashActivity.this, SignInUpActivity.class);
+                        startActivity(i);
+                        finish();
+                    } else {
+                        startActivity(new Intent(SplashActivity.this, FrontActivity.class));
+                        finish();
+                    }
                 }
-                else {
-                    startService(new Intent(SplashActivity.this,BackgroundService.class));
-                    startActivity(new Intent(SplashActivity.this,FrontActivity.class));
-                    finish();
-                }
-            }
-        },1000);
+            }, 1000);
+        }
     }
 
     private void zoom() {
