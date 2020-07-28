@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AppOpsManager;
 import android.app.Dialog;
@@ -50,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static android.content.pm.PackageManager.MATCH_ALL;
+
 public class FrontActivity extends AppCompatActivity {
 
     private final static String TAG = "Soumil";
@@ -79,6 +82,7 @@ public class FrontActivity extends AppCompatActivity {
     public static final String USAGE_MIN = "min";
 
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,9 +102,8 @@ public class FrontActivity extends AppCompatActivity {
 
 
 
-    SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
-
 
 
         String json = sharedPreferences.getString(BAD_APP_LIST, null);
@@ -146,7 +149,7 @@ public class FrontActivity extends AppCompatActivity {
         for(String pname1 : tempListGood){
             ApplicationInfo app = new ApplicationInfo();
             try {
-                app = pm.getApplicationInfo(pname1, PackageManager.MATCH_UNINSTALLED_PACKAGES);
+                app = pm.getApplicationInfo(pname1, MATCH_ALL);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
@@ -181,14 +184,14 @@ public class FrontActivity extends AppCompatActivity {
             startMillis = cal.getTimeInMillis();
             endMillis = startMillis+3600000;
             List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,startMillis, endMillis);
-            Log.d("Aniket",sdf.format(startMillis));
-            Log.d("Aniket",sdf.format(endMillis));
+            //Log.d("Aniket",sdf.format(startMillis));
+            //Log.d("Aniket",sdf.format(endMillis));
             for (UsageStats usageStats : lUsageStatsMap){
                 if(pack.equals(usageStats.getPackageName())){
                     long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
                     long timeInSec = totalTimeUsageInMillis/1000;
                     float hour = (float) ((timeInSec*1.0)/3600);
-                    Log.d(String.valueOf(i), String.valueOf(hour));
+                    //Log.d(String.valueOf(i), String.valueOf(hour));
                     barEntries.add(new BarEntry(i,hour));
                 }
             }
@@ -317,8 +320,10 @@ public class FrontActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String json = gson.toJson(tempList);
         String jsh = gson.toJson(hourList);
+        String jsm = gson.toJson(minList);
         editor.putString(BAD_APP_LIST, json);
         editor.putString(USAGE_HOUR, jsh);
+        editor.putString(USAGE_MIN, jsm);
         editor.apply();
 
 

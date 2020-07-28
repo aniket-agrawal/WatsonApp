@@ -49,6 +49,8 @@ import static android.content.Context.MODE_PRIVATE;
 import static com.example.watsonapp.FrontActivity.BAD_APP_LIST;
 import static com.example.watsonapp.FrontActivity.GOOD_APP_LIST;
 import static com.example.watsonapp.FrontActivity.SHARED_PREFS;
+import static com.example.watsonapp.FrontActivity.USAGE_HOUR;
+import static com.example.watsonapp.FrontActivity.USAGE_MIN;
 
 public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadAppsAdapter.ViewHolder> implements Filterable {
 
@@ -62,6 +64,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
     String dialogName;
     BarData barData;
     ArrayList<String> tempList;
+    ArrayList<Integer> hourList,minList;
     int type;
 
     public RecyclerBadAppsAdapter(Activity activity, ArrayList<Apps> apps, int type) {
@@ -245,23 +248,44 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
     private void addBadApps(String pname, int hour, int min) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
+
+
+
         String json = sharedPreferences.getString(BAD_APP_LIST, null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        tempList = gson.fromJson(json, type);
+        String jsh = sharedPreferences.getString(USAGE_HOUR,null);
+        String jsm = sharedPreferences.getString(USAGE_MIN,null);
+        Type typer = new TypeToken<ArrayList<String>>() {}.getType();
+        Type type1 = new TypeToken<ArrayList<Integer>>(){}.getType();
+        tempList = gson.fromJson(json, typer);
+        hourList = gson.fromJson(jsh,type1);
+        minList = gson.fromJson(jsm,type1);
 
         if(tempList == null){
             tempList = new ArrayList<String>();
             tempList.clear();
         }
+        if(hourList == null){
+            hourList = new ArrayList<Integer>();
+            hourList.clear();
+        }
+        if(minList == null){
+            minList = new ArrayList<Integer>();
+            minList.clear();
+        }
         tempList.add(pname);
+        hourList.add(hour);
+        minList.add(min);
 
         SharedPreferences sharedPreferences1 = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences1.edit();
         Gson gson1 = new Gson();
         String json1 = gson1.toJson(tempList);
+        String jsh1 = gson1.toJson(hourList);
+        String jsm1 = gson1.toJson(minList);
         editor.putString(BAD_APP_LIST, json1);
+        editor.putString(USAGE_HOUR, jsh1);
+        editor.putString(USAGE_MIN, jsm1);
         editor.apply();
-
 
         finalDialog.dismiss();
     }
