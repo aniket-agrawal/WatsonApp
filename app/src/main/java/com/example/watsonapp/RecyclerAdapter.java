@@ -44,6 +44,8 @@ import static android.content.Context.MODE_PRIVATE;
 import static com.example.watsonapp.FrontActivity.BAD_APP_LIST;
 import static com.example.watsonapp.FrontActivity.GOOD_APP_LIST;
 import static com.example.watsonapp.FrontActivity.SHARED_PREFS;
+import static com.example.watsonapp.FrontActivity.USAGE_HOUR;
+import static com.example.watsonapp.FrontActivity.USAGE_MIN;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> implements Filterable {
     private final static String TAG = "Soumil";
@@ -114,7 +116,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             Apps app = apps.get(position);
             Drawable icon = app.appIcon;
             String name = app.appName;
-            Log.d("A",name);
             imageIcon.setImageDrawable(icon);
             nameApp.setText(name);
             pname.setText(app.pname);
@@ -141,6 +142,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         Button add = finalDialog.findViewById(R.id.add);
         TextView hour = finalDialog.findViewById(R.id.hour);
         TextView min = finalDialog.findViewById(R.id.min);
+        if(type==0) showTime(packagename,hour,min);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,6 +155,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         finalDialog.show();
     }
+
 
     private BarData usage(String packagename) {
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
@@ -194,12 +197,17 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
         Type typer = new TypeToken<ArrayList<String>>() {}.getType();
         tempList = gson.fromJson(json, typer);
-
-        if(tempList == null){
-            tempList = new ArrayList<>();
-            tempList.clear();
-        }
+        int i = tempList.indexOf(pname);
         tempList.remove(pname);
+
+        if(type==0){
+            String jsh = sharedPreferences.getString(USAGE_HOUR,null);
+            String jsm = sharedPreferences.getString(USAGE_MIN,null);
+            Type type1 = new TypeToken<ArrayList<Integer>>(){}.getType();
+            hourList = gson.fromJson(jsh,type1);
+            minList = gson.fromJson(jsm,type1);
+        }
+
 
         SharedPreferences sharedPreferences1 = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences1.edit();
@@ -207,6 +215,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         String json1 = gson1.toJson(tempList);
         if(type==0) {
             editor.putString(BAD_APP_LIST, json1);
+            hourList.remove(i);
+            minList.remove(i);
+            String jsh1 = gson1.toJson(hourList);
+            String jsm1 = gson1.toJson(minList);
+            editor.putString(USAGE_HOUR, jsh1);
+            editor.putString(USAGE_MIN, jsm1);
         }
         else {
             editor.putString(GOOD_APP_LIST, json1);
@@ -256,4 +270,24 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         }
     };
+
+    private void showTime(String pname, TextView hour, TextView min) {
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        Gson gson = new Gson();
+
+        String json = sharedPreferences.getString(BAD_APP_LIST, null);
+        String jsh = sharedPreferences.getString(USAGE_HOUR,null);
+        String jsm = sharedPreferences.getString(USAGE_MIN,null);
+        Type typer = new TypeToken<ArrayList<String>>() {}.getType();
+        Type type1 = new TypeToken<ArrayList<Integer>>(){}.getType();
+        tempList = gson.fromJson(json, typer);
+        hourList = gson.fromJson(jsh,type1);
+        minList = gson.fromJson(jsm,type1);
+
+        int i = tempList.indexOf(pname);
+        hour.setText(hourList.get(i).toString());
+        min.setText(minList.get(i).toString());
+
+    }
+
 }
