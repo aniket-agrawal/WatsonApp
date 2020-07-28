@@ -73,8 +73,10 @@ public class BackgroundService extends Service {
             tempList.clear();
         }
         if(tempList.contains(printForegroundTask())){
-            Intent myIntent = new Intent(BackgroundService.this,Block.class);
+            Intent myIntent = getPackageManager().getLaunchIntentForPackage("com.example.watsonapp");
+            //Intent myIntent = new Intent(BackgroundService.this,Block.class);
             myIntent.addCategory(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            myIntent.putExtra("A",1);
             myIntent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
             myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(myIntent);
