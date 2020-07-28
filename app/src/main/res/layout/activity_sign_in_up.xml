@@ -19,17 +19,28 @@
             android:layout_height="wrap_content">
 
 
-            <TextView
-                android:id="@+id/login_image"
+<!--            <TextView-->
+<!--                android:id="@+id/login_image"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="220dp"-->
+<!--                android:fontFamily="@font/calligraffitti"-->
+<!--                android:gravity="center"-->
+<!--                android:text="WATSON"-->
+<!--                android:textAlignment="center"-->
+<!--                android:textSize="70dp"-->
+<!--                android:typeface="serif"-->
+<!--                android:textColor="@color/colorPrimaryDark"-->
+<!--                android:visibility="invisible"/>-->
+
+            <com.airbnb.lottie.LottieAnimationView
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
-                android:fontFamily="@font/calligraffitti"
-                android:gravity="center"
-                android:text="WATSON"
-                android:textAlignment="center"
-                android:textSize="70dp"
-                android:typeface="serif"
-                android:textColor="@color/colorPrimaryDark"/>
+                android:id="@+id/lottie_anim_watson"
+                app:lottie_loop="true"
+                app:lottie_fileName="watson.json"
+                android:visibility="visible"
+                app:lottie_autoPlay="true"
+                />
 
             <EditText
                 android:id="@+id/login_user_name"
@@ -38,7 +49,7 @@
                 android:layout_alignParentStart="true"
 
 
-                android:layout_below="@+id/login_image"
+                android:layout_below="@+id/lottie_anim_watson"
                 android:hint="Email..."
                 android:inputType="textEmailAddress"
                 android:background="@drawable/inputs"
@@ -99,6 +110,31 @@
                 android:textColor="@android:color/background_light"
                 android:background="@drawable/buttons"
                 />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:id="@+id/lottie_anim"
+                app:lottie_loop="false"
+                android:layout_below="@+id/login_user_name"
+                android:layout_marginTop="55dp"
+                android:layout_marginBottom="12dp"
+                android:layout_centerHorizontal="true"
+                app:lottie_fileName="ld.json"
+                app:lottie_autoPlay="false"
+                android:visibility="invisible"
+
+                />
+
+            <ProgressBar
+                android:id="@+id/progress_signin"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/forget_password_link"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="12dp"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/need_new_account"
