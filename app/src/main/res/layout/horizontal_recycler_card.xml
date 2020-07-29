@@ -6,8 +6,8 @@
     >
 
     <androidx.cardview.widget.CardView
-        android:layout_width="110dp"
-        android:layout_height="110dp"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
         app:cardCornerRadius="4dp"
         app:cardMaxElevation="2dp"
         android:elevation="1dp"
@@ -23,10 +23,20 @@
             android:background="#04606E"
             >
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_time_left"
+                android:layout_centerHorizontal="true"
+                android:text="time left"
+                android:layout_marginBottom="2dp"
+                />
+
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:scaleType="centerCrop"
+                android:layout_below="@id/text_time_left"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/icon_image_card"
                 android:src="@drawable/ic_launcher_background"/>
