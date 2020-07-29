@@ -59,7 +59,6 @@ public class FrontActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1;
     PackageManager pm;
     ArrayList<Apps> apps = new ArrayList<Apps>();
-    ArrayList<Apps> nameList = new ArrayList<Apps>();
     ArrayList<Apps> badApps = new ArrayList<>();
     ArrayList<String> tempList;
     ArrayList<Integer> hourList,minList;
@@ -285,6 +284,9 @@ public class FrontActivity extends AppCompatActivity {
         final EditText hour = finalDialog.findViewById(R.id.hour);
         final EditText min = finalDialog.findViewById(R.id.min);
         Button add = finalDialog.findViewById(R.id.add);
+        final TextView avgWeek = finalDialog.findViewById(R.id.avg_week);
+        final TextView prevDay = finalDialog.findViewById(R.id.previous_day);
+        setUsage(packagename,avgWeek,prevDay);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -302,13 +304,14 @@ public class FrontActivity extends AppCompatActivity {
         finalDialog.show();
     }
 
+
     private void addBadApps(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
         PackageManager pm = getPackageManager();
 
 
 
         ApplicationInfo app = pm.getApplicationInfo(pname,PackageManager.MATCH_UNINSTALLED_PACKAGES);
-        Apps app1 = new Apps((String) app.loadLabel(pm),app.loadIcon(pm),app.packageName);
+        Apps app1 = new Apps((String) app.loadLabel(pm),app.loadIcon(pm),app.packageName,hour,min);
         badApps.add(app1);
 
         tempList.add(pname);
@@ -326,6 +329,7 @@ public class FrontActivity extends AppCompatActivity {
         editor.putString(USAGE_MIN, jsm);
         editor.apply();
 
+        initReceivedRecyclerView();
 
         finalDialog.dismiss();
     }
@@ -359,4 +363,45 @@ public class FrontActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void setUsage(String pack, TextView avgWeek, TextView prevDay) {
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.MINUTE, 00);
+        cal.set(Calendar.SECOND, 00);
+        long start = cal.getTimeInMillis()-86400000;
+        long end = start+3600000;
+        long total = 0;
+        List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,start, end);
+        for (UsageStats usageStats : lUsageStatsMap){
+            if(pack.equals(usageStats.getPackageName())){
+                long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
+                long timeInSec = totalTimeUsageInMillis/1000;
+                total = timeInSec;
+                long hour = timeInSec/3600;
+                long min = (timeInSec - (hour * 3600)) / 60;
+                String prev = hour+":"+min;
+                prevDay.setText(prev);
+            }
+        }
+        for (int i =0;i<6;i++){
+            start -= 86400000;
+            end = start+3600000;
+            lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,start, end);
+            for (UsageStats usageStats : lUsageStatsMap){
+                if(pack.equals(usageStats.getPackageName())){
+                    long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
+                    long timeInSec = totalTimeUsageInMillis/1000;
+                    total += timeInSec;
+                }
+            }
+        }
+        total = total/7;
+        long hour = total/3600;
+        long min = (total - (hour * 3600)) / 60;
+        String avg = hour+":"+min;
+        avgWeek.setText(avg);
+    }
+
 }

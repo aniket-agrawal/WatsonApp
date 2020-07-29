@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="370dp"
-    android:layout_height="500dp"
+    android:layout_height="600dp"
     android:background="@color/bluelight"
     android:padding="5dp"
     android:layout_gravity="center">
@@ -56,7 +56,59 @@
 
 
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Usage Average for 7 days - "
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:gravity="center"/>
 
+        <TextView
+            android:layout_gravity="center"
+            android:id="@+id/avg_week"
+            android:text="0:0"
+            android:layout_width="100dp"
+            android:gravity="center"
+            android:layout_height="40dp"
+            android:textColor="#ffffff"
+            android:textAlignment="center"
+            android:inputType="number"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Usage time for  yesterday - "
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:gravity="center"/>
+
+        <TextView
+            android:layout_gravity="center"
+            android:id="@+id/previous_day"
+            android:layout_width="100dp"
+            android:gravity="center"
+            android:text="0:0"
+            android:layout_height="40dp"
+            android:textColor="#ffffff"
+            android:textAlignment="center"
+            android:inputType="number"/>
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"

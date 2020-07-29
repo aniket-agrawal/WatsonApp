@@ -192,6 +192,9 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         if(type==0) {
             final TextView hour = finalDialog.findViewById(R.id.hour);
             final TextView min = finalDialog.findViewById(R.id.min);
+            final TextView avgWeek = finalDialog.findViewById(R.id.avg_week);
+            final TextView prevDay = finalDialog.findViewById(R.id.previous_day);
+            setUsage(packagename,avgWeek,prevDay);
             Button add = finalDialog.findViewById(R.id.add);
             add.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -312,6 +315,46 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
 
 
         finalDialog.dismiss();
+    }
+
+    private void setUsage(String pack, TextView avgWeek, TextView prevDay) {
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.MINUTE, 00);
+        cal.set(Calendar.SECOND, 00);
+        long start = cal.getTimeInMillis()-86400000;
+        long end = start+3600000;
+        long total = 0;
+        List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,start, end);
+        for (UsageStats usageStats : lUsageStatsMap){
+            if(pack.equals(usageStats.getPackageName())){
+                long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
+                long timeInSec = totalTimeUsageInMillis/1000;
+                total = timeInSec;
+                long hour = timeInSec/3600;
+                long min = (timeInSec - (hour * 3600)) / 60;
+                String prev = hour+":"+min;
+                prevDay.setText(prev);
+            }
+        }
+        for (int i =0;i<6;i++){
+            start -= 86400000;
+            end = start+3600000;
+            lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,start, end);
+            for (UsageStats usageStats : lUsageStatsMap){
+                if(pack.equals(usageStats.getPackageName())){
+                    long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
+                    long timeInSec = totalTimeUsageInMillis/1000;
+                    total += timeInSec;
+                }
+            }
+        }
+        total = total/7;
+        long hour = total/3600;
+        long min = (total - (hour * 3600)) / 60;
+        String avg = hour+":"+min;
+        avgWeek.setText(avg);
     }
 
 }
