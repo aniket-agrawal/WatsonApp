@@ -1,5 +1,6 @@
 package com.example.watsonapp;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.usage.UsageStats;
@@ -96,7 +97,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         CircleImageView imageIcon;
-        TextView nameApp,pname;
+        TextView nameApp,pname,timeLeft;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -109,8 +110,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     deleteOrShow(pname.getText().toString());
                 }
             });
+            timeLeft = itemView.findViewById(R.id.text_time_left);
         }
 
+        @SuppressLint("SetTextI18n")
         public void bindView(int position)
         {
             Apps app = apps.get(position);
@@ -120,6 +123,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             nameApp.setText(name);
             pname.setText(app.pname);
             pname.setVisibility(View.INVISIBLE);
+            if (type == 0){
+                timeLeft.setText(app.hour+":"+app.min);
+            }
         }
     }
 
