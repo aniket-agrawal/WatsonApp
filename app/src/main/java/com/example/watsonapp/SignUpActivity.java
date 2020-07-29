@@ -145,7 +145,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         if(task.isSuccessful()){
                                             b = false;
                                             Toast.makeText(SignUpActivity.this, "Signed Up", Toast.LENGTH_SHORT).show();
-                                            startActivity(new Intent(SignUpActivity.this,MainPage.class));
+                                            startActivity(new Intent(SignUpActivity.this,FrontActivity.class));
                                             finish();
                                         }
                                         else{

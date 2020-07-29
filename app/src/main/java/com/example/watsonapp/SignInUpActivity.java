@@ -234,7 +234,7 @@ public class SignInUpActivity extends AppCompatActivity {
                                         finish();
                                     }
                                     else{
-                                        startActivity(new Intent(SignInUpActivity.this,MainPage.class));
+                                        startActivity(new Intent(SignInUpActivity.this,FrontActivity.class));
                                         finish();
                                     }
                                 }
@@ -274,7 +274,7 @@ public class SignInUpActivity extends AppCompatActivity {
 
                                     }
                                     else{
-                                        startActivity(new Intent(SignInUpActivity.this,MainPage.class));
+                                        startActivity(new Intent(SignInUpActivity.this,FrontActivity.class));
                                         finish();
                                     }
                                 }

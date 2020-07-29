@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
                             if(task.isSuccessful()){
                                 b = false;
                                 Toast.makeText(MainActivity.this, "Registered", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(MainActivity.this,MainPage.class));
+                                startActivity(new Intent(MainActivity.this,FrontActivity.class));
                                 finish();
                             }
                             else{
