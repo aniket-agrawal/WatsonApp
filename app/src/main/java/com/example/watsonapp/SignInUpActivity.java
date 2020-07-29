@@ -13,9 +13,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -55,6 +57,8 @@ public class SignInUpActivity extends AppCompatActivity {
 
     Animation atg,atgone,atgtwo;
 
+    ProgressBar progressBarSignIn;
+
     EditText email,password;
     FirebaseAuth mAuth;
     String mail,pass;
@@ -65,6 +69,7 @@ public class SignInUpActivity extends AppCompatActivity {
     TextView loginImage, forgetPasswordLink;
     Button loginButton, googleButton, facebookButton, createAccountButton;
     View divider1, divider2;
+    LottieAnimationView loadingLottie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +80,10 @@ public class SignInUpActivity extends AppCompatActivity {
         atgone = AnimationUtils.loadAnimation(this,R.anim.atgone);
         atgtwo = AnimationUtils.loadAnimation(this,R.anim.atgtwo);
 
-        loginImage = findViewById(R.id.login_image);
+        progressBarSignIn = findViewById(R.id.progress_signin);
+        loadingLottie = findViewById(R.id.lottie_anim);
+
+//        loginImage = findViewById(R.id.login_image);
         forgetPasswordLink = findViewById(R.id.forget_password_link);
         loginButton = findViewById(R.id.login_button);
         googleButton = findViewById(R.id.google_login_button);
@@ -86,7 +94,7 @@ public class SignInUpActivity extends AppCompatActivity {
         divider1 = findViewById(R.id.divider_facebook_create_new);
         divider2 = findViewById(R.id.divider_login_google);
 
-        loginImage.startAnimation(atg);
+//        loginImage.startAnimation(atg);
 
         email.startAnimation(atgone);
         password.startAnimation(atgone);
@@ -132,6 +140,10 @@ public class SignInUpActivity extends AppCompatActivity {
     public void Login(View view) {
         mail = email.getText().toString().trim();
         pass = password.getText().toString().trim();
+        loginButton.setVisibility(View.INVISIBLE);
+        loadingLottie.setVisibility(View.VISIBLE);
+//        progressBarSignIn.setVisibility(View.VISIBLE);
+        loadingLottie.playAnimation();
         if(checkInput()) {
             mAuth.signInWithEmailAndPassword(mail, pass)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -143,7 +155,9 @@ public class SignInUpActivity extends AppCompatActivity {
                                 finish();
 
                             } else {
-                                Toast.makeText(SignInUpActivity.this, "User not exist",
+                                loginButton.setVisibility(View.VISIBLE);
+                                loadingLottie.setVisibility(View.INVISIBLE);
+                                Toast.makeText(SignInUpActivity.this, "User does not exist",
                                         Toast.LENGTH_SHORT).show();
                             }
 

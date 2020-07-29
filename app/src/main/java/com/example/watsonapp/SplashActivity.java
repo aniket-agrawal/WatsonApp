@@ -40,7 +40,8 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(new Intent(SplashActivity.this, Block.class));
             finish();
         } else {
-            zoom();
+//            zoom();
+
         /*SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
 
@@ -71,15 +72,15 @@ public class SplashActivity extends AppCompatActivity {
                         finish();
                     }
                 }
-            }, 1000);
+            }, 2000);
         }
     }
 
-    private void zoom() {
-        ImageView image = (ImageView)findViewById(R.id.imageView);
-        Animation animation1 =
-                AnimationUtils.loadAnimation(getApplicationContext(),
-                        R.anim.zoomin);
-        image.startAnimation(animation1);
-    }
+//    private void zoom() {
+//        ImageView image = (ImageView)findViewById(R.id.imageView);
+//        Animation animation1 =
+//                AnimationUtils.loadAnimation(getApplicationContext(),
+//                        R.anim.zoomin);
+//        image.startAnimation(animation1);
+//    }
 }
