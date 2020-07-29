@@ -254,7 +254,11 @@ public class FrontActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         n.setText(pm.getApplicationLabel(applicationInfo));
-        i.setImageDrawable(pm.getApplicationIcon(s));
+        try {
+            i.setImageDrawable(pm.getApplicationIcon(s));
+        }catch (Exception e){
+
+        }
         i.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
