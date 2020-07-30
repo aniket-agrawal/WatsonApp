@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,6 +26,8 @@ public class Block extends AppCompatActivity {
     ArrayList<String> tempListBlock;
     public static final String INTEGER_PREF = "Integer Block";
     int prefInt;
+    String app;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +35,7 @@ public class Block extends AppCompatActivity {
         setContentView(R.layout.activity_block);
 
 
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString(GOOD_APP_LIST, null);
         Type type1 = new TypeToken<ArrayList<String>>(){}.getType();
@@ -40,14 +44,6 @@ public class Block extends AppCompatActivity {
             tempListBlock = new ArrayList<String>();
             tempListBlock.clear();
         }
-
-
-        prefInt = sharedPreferences.getInt(INTEGER_PREF, 0);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(INTEGER_PREF, prefInt);
-        editor.apply();
-
 
     }
 
@@ -60,7 +56,27 @@ public class Block extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             v.vibrate(VibrationEffect.createOneShot(5000, VibrationEffect.DEFAULT_AMPLITUDE));
         } else {
-            v.vibrate(5000);
+            v.vibrate(2000);
+        }
+        prefInt = sharedPreferences.getInt(INTEGER_PREF, 0);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        int next = prefInt + 1;
+        next = next % tempListBlock.size();
+        editor.putInt(INTEGER_PREF, next);
+        editor.apply();
+        try {
+            app = tempListBlock.get(prefInt);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent myIntent = getPackageManager().getLaunchIntentForPackage(app);
+                    startActivity(myIntent);
+                    finish();
+                }
+            }, 2000);
+        }catch (Exception e){
+            Toast.makeText(this, "No Good App Selected.", Toast.LENGTH_SHORT).show();
         }
     }
 
