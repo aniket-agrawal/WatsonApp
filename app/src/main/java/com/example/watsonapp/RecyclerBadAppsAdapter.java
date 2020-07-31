@@ -334,7 +334,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
                 total = timeInSec;
                 long hour = timeInSec/3600;
                 long min = (timeInSec - (hour * 3600)) / 60;
-                String prev = hour+":"+min;
+                String prev = hour+" hr "+min+" min";
                 prevDay.setText(prev);
             }
         }
@@ -353,7 +353,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         total = total/7;
         long hour = total/3600;
         long min = (total - (hour * 3600)) / 60;
-        String avg = hour+":"+min;
+        String avg = hour+" hr "+min+" min";
         avgWeek.setText(avg);
     }
 

@@ -124,7 +124,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             pname.setText(app.pname);
             pname.setVisibility(View.INVISIBLE);
             if (type == 0){
-                timeLeft.setText(app.hour+":"+app.min);
+                timeLeft.setText(app.hour+" hr "+app.min+" min");
             }
         }
     }

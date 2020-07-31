@@ -3,7 +3,6 @@ package com.example.watsonapp;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,10 +22,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,21 +30,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.StackedValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static android.content.pm.PackageManager.MATCH_ALL;
 
@@ -95,7 +90,6 @@ public class FrontActivity extends AppCompatActivity {
         context = getApplicationContext();
         apps.clear();
         badApps.clear();
-        barChart.setData(usage("com.whatsapp"));
         recyclerViewApps = findViewById(R.id.recycler_view_show_icons);
         recyclerViewAppsGood = findViewById(R.id.recycler_view_show_icons_good);
 
@@ -156,6 +150,7 @@ public class FrontActivity extends AppCompatActivity {
             apps.add(new Apps((String) app.loadLabel(pm), app.loadIcon(pm),app.packageName));
         }
 
+        usageAll(barChart);
         initReceivedRecyclerView();
     }
 
@@ -174,7 +169,6 @@ public class FrontActivity extends AppCompatActivity {
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar cal = Calendar.getInstance();
         ArrayList<BarEntry> barEntries = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         cal.set(Calendar.HOUR_OF_DAY, 12);
         cal.set(Calendar.MINUTE, 00);
         cal.set(Calendar.SECOND, 00);
@@ -199,6 +193,94 @@ public class FrontActivity extends AppCompatActivity {
         barData = new BarData();
         barData.addDataSet(barDataSet);
         return barData;
+    }
+
+    public void usageAll(BarChart chart) {
+        setGraph(chart);
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+        Calendar cal = Calendar.getInstance();
+        ArrayList<BarEntry> barEntries = new ArrayList<>();
+        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.MINUTE, 00);
+        cal.set(Calendar.SECOND, 00);
+        startMillis = cal.getTimeInMillis();
+        endMillis = startMillis + 3600000;
+        for (int i = 0; i < 7; i++) {
+            float badh = 0, goodh = 0, neutralh = 0;
+            List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startMillis, endMillis);
+            for (UsageStats usageStats : lUsageStatsMap) {
+                long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
+                long timeInSec = totalTimeUsageInMillis / 1000;
+                if (tempList.contains(usageStats.getPackageName())) {
+                    badh += (float) ((timeInSec * 1.0) / 3600);
+                }
+                else if (tempListGood.contains(usageStats.getPackageName())) {
+                    goodh += (float) ((timeInSec * 1.0) / 3600);
+                }
+                else {
+                    neutralh += (float) ((timeInSec * 1.0) / 3600);
+                }
+            }
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(startMillis);
+            barEntries.add(new BarEntry(calendar.getTime().getDate(), new float[]{goodh, neutralh, badh}));
+            startMillis -= 86400000;
+            endMillis = startMillis + 3600000;
+        }
+        BarDataSet barDataSet = new BarDataSet(barEntries,"usage");
+        barDataSet.setDrawValues(false);
+        barDataSet.setBarBorderWidth(1.f);
+        barDataSet.setColors(getColors());
+        barDataSet.setStackLabels(new String[]{"Good", "Neutral", "Bad"});
+        BarData barData = new BarData();
+        barData.addDataSet(barDataSet);
+        barData.setValueFormatter(new StackedValueFormatter(false, "", 1));
+        barData.setValueTextColor(Color.WHITE);
+        chart.setData(barData);
+
+        chart.getData().setHighlightEnabled(false);
+        chart.setFitBars(true);
+        chart.animateY(1000);
+        chart.invalidate();
+    }
+
+    private void setGraph(BarChart chart) {
+        chart.setDrawValueAboveBar(true);
+        chart.getDescription().setEnabled(false);
+
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f); // only intervals of 1 day
+        xAxis.setLabelCount(7);
+
+
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setLabelCount(8, false);
+        leftAxis.setDrawGridLines(false);
+        leftAxis.setGranularity(1f);
+        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        leftAxis.setSpaceTop(15f);
+        leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setDrawGridLines(false);
+        rightAxis.setGranularity(1f);
+        rightAxis.setLabelCount(8, false);
+        rightAxis.setSpaceTop(15f);
+        rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.CIRCLE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
     }
 
 
@@ -385,7 +467,7 @@ public class FrontActivity extends AppCompatActivity {
                 total = timeInSec;
                 long hour = timeInSec/3600;
                 long min = (timeInSec - (hour * 3600)) / 60;
-                String prev = hour+":"+min;
+                String prev = hour+" hr "+min+" min";
                 prevDay.setText(prev);
             }
         }
@@ -404,8 +486,18 @@ public class FrontActivity extends AppCompatActivity {
         total = total/7;
         long hour = total/3600;
         long min = (total - (hour * 3600)) / 60;
-        String avg = hour+":"+min;
+        String avg = hour+" hr "+min+" min";
         avgWeek.setText(avg);
+    }
+
+    private int[] getColors() {
+
+        // have as many colors as stack-values per entry
+        int[] colors = new int[3];
+
+        System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3);
+
+        return colors;
     }
 
 }
