@@ -26,10 +26,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.anychart.AnyChart;
+import com.anychart.AnyChartView;
+import com.anychart.chart.common.dataentry.DataEntry;
+import com.anychart.chart.common.dataentry.ValueDataEntry;
+import com.anychart.charts.Pie;
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -98,12 +109,15 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         CircleImageView imageIcon;
         TextView nameApp,pname,timeLeft;
+        PieChart pieChart;
+        AnyChartView anyChartView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageIcon = itemView.findViewById(R.id.icon_image_card);
             nameApp = itemView.findViewById(R.id.card_app_name);
             pname = itemView.findViewById(R.id.card_app_package_name);
+//            anyChartView = itemView.findViewById(R.id.pie_time_left);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -124,8 +138,39 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             pname.setText(app.pname);
             pname.setVisibility(View.INVISIBLE);
             if (type == 0){
-                timeLeft.setText(app.hour+" hr "+app.min+" min");
+                timeLeft.setText(app.hour+"h"+":"+app.min+"m");
             }
+
+//            pieChart.setUsePercentValues(true);
+//            pieChart.getDescription().setEnabled(false);
+//            pieChart.setExtraOffsets(2, 4, 2, 2);
+//            pieChart.setDragDecelerationFrictionCoef(0.9f);
+//            pieChart.setTransparentCircleRadius(5f);
+//            pieChart.setHoleColor(Color.WHITE);
+////            pieChart.animateY(1000, Easing.EaseInOutCubic);
+//            ArrayList<PieEntry> yValues = new ArrayList<>();
+//            yValues.add(new PieEntry(3.4f,"I"));
+//            yValues.add(new PieEntry(5.6f,"T"));
+//
+//
+//            PieDataSet dataSet = new PieDataSet(yValues, "D");
+//                    dataSet.setSliceSpace(0.2f);
+//            dataSet.setSelectionShift(2f);
+//            dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+//            PieData pieData = new PieData((dataSet));
+//            pieData.setValueTextSize(1f);
+//            pieData.setValueTextColor(Color.YELLOW);
+//            pieChart.setData(pieData);
+
+//            Pie pie = AnyChart.pie();
+//            List<DataEntry> dataEntries = new ArrayList<>();
+//            dataEntries.add(new ValueDataEntry("time left", 36));
+//            dataEntries.add(new ValueDataEntry("time used", 24));
+//
+//            pie.data(dataEntries);
+//            anyChartView.setChart(pie);
+
+
         }
     }
 

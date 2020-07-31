@@ -6,8 +6,8 @@
     >
 
     <androidx.cardview.widget.CardView
-        android:layout_width="130dp"
-        android:layout_height="130dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         app:cardCornerRadius="4dp"
         app:cardMaxElevation="2dp"
         android:elevation="1dp"
@@ -22,21 +22,39 @@
             android:layout_height="match_parent"
             android:background="#04606E"
             >
+            <ImageView
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:id="@+id/image_time_left"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/clock4" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/text_time_left"
-                android:layout_centerHorizontal="true"
+                android:layout_alignParentEnd="true"
+                android:textColor="@android:color/black"
+                android:textSize="10.8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="18dp"
                 android:text=""
-                android:layout_marginBottom="2dp"
                 />
 
+<!--            <com.anychart.AnyChartView-->
+<!--                android:layout_width="55dp"-->
+<!--                android:layout_height="55dp"-->
+<!--                android:id="@+id/pie_time_left"-->
+<!--                />-->
+<!--            android:layout_centerHorizontal="true"-->
+<!--            android:layout_marginBottom="2dp"-->
+<!--            android:layout_below="@id/text_time_left"-->
+
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="85dp"
+                android:layout_height="85dp"
                 android:scaleType="centerCrop"
-                android:layout_below="@id/text_time_left"
+                android:layout_marginTop="30dp"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/icon_image_card"
                 android:src="@drawable/ic_launcher_background"/>
