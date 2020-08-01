@@ -29,6 +29,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.watsonapp.custom.DayAxisValueFormatter;
+import com.example.watsonapp.custom.XYMarkerView;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -37,6 +39,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.StackedValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -223,7 +226,7 @@ public class FrontActivity extends AppCompatActivity {
             }
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(startMillis);
-            barEntries.add(new BarEntry(calendar.getTime().getDate(), new float[]{goodh, neutralh, badh}));
+            barEntries.add(new BarEntry(calendar.get(Calendar.DAY_OF_YEAR), new float[]{goodh, neutralh, badh}));
             startMillis -= 86400000;
             endMillis = startMillis + 3600000;
         }
@@ -238,8 +241,8 @@ public class FrontActivity extends AppCompatActivity {
         barData.setValueTextColor(Color.WHITE);
         chart.setData(barData);
 
-        chart.getData().setHighlightEnabled(false);
         chart.setFitBars(true);
+        chart.setScaleEnabled(false);
         chart.animateY(1000);
         chart.invalidate();
     }
@@ -255,7 +258,8 @@ public class FrontActivity extends AppCompatActivity {
         xAxis.setGranularity(1f); // only intervals of 1 day
         xAxis.setLabelCount(7);
 
-
+        ValueFormatter xAxisFormatter = new DayAxisValueFormatter(chart);
+        xAxis.setValueFormatter(xAxisFormatter);
 
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setLabelCount(8, false);
@@ -281,6 +285,11 @@ public class FrontActivity extends AppCompatActivity {
         l.setFormSize(9f);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
+
+        XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
+        mv.setChartView(chart);
+        chart.setMarker(mv);
+
     }
 
 
