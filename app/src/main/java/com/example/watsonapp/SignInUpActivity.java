@@ -70,6 +70,7 @@ public class SignInUpActivity extends AppCompatActivity {
     Button loginButton, googleButton, facebookButton, createAccountButton;
     View divider1, divider2;
     LottieAnimationView loadingLottie;
+    ProgressBar progressBarGoogle, progressBarFacebook, progressBarCreate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +94,10 @@ public class SignInUpActivity extends AppCompatActivity {
         password = (EditText)findViewById(R.id.login_password);
         divider1 = findViewById(R.id.divider_facebook_create_new);
         divider2 = findViewById(R.id.divider_login_google);
+
+        progressBarGoogle = findViewById(R.id.progress_google_sign_in);
+        progressBarFacebook = findViewById(R.id.progress_facebook_sign_in);
+        progressBarCreate = findViewById(R.id.progress_create_new_account);
 
 //        loginImage.startAnimation(atg);
 
@@ -133,6 +138,8 @@ public class SignInUpActivity extends AppCompatActivity {
     }
 
     public void signUp(View view) {
+        createAccountButton.setVisibility(View.INVISIBLE);
+        progressBarCreate.setVisibility(View.VISIBLE);
         startActivity(new Intent(SignInUpActivity.this,SignUpActivity.class));
         finish();
     }
@@ -192,6 +199,8 @@ public class SignInUpActivity extends AppCompatActivity {
     }
 
     public void GoogleSignIn(View view) {
+        googleButton.setVisibility(View.INVISIBLE);
+        progressBarGoogle.setVisibility(View.VISIBLE);
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -205,6 +214,8 @@ public class SignInUpActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
+                googleButton.setVisibility(View.VISIBLE);
+                progressBarGoogle.setVisibility(View.INVISIBLE);
                 Toast.makeText(SignInUpActivity.this,"Error occurred: Retry",Toast.LENGTH_SHORT).show();
             }
         }
@@ -245,6 +256,8 @@ public class SignInUpActivity extends AppCompatActivity {
                                 }
                             });
                         } else {
+                            googleButton.setVisibility(View.VISIBLE);
+                            progressBarGoogle.setVisibility(View.INVISIBLE);
                             Toast.makeText(SignInUpActivity.this, "Sign in Failed", Toast.LENGTH_SHORT).show();
                         }
 
@@ -285,6 +298,8 @@ public class SignInUpActivity extends AppCompatActivity {
                                 }
                             });
                         } else {
+                            facebookButton.setVisibility(View.VISIBLE);
+                            progressBarFacebook.setVisibility(View.INVISIBLE);
                             Toast.makeText(SignInUpActivity.this, "Sign in Failed", Toast.LENGTH_SHORT).show();
                         }
 
@@ -293,6 +308,8 @@ public class SignInUpActivity extends AppCompatActivity {
     }
 
     public void FacebookSignIn(View view) {
+        facebookButton.setVisibility(View.INVISIBLE);
+        progressBarFacebook.setVisibility(View.VISIBLE);
         List<String> anotherList = new ArrayList<>();
         anotherList.add("email");
         anotherList.add("public_profile");

@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +72,8 @@ public class FrontActivity extends AppCompatActivity {
     String packagename;
     BarData barData;
     int type;
+    ProgressBar progressBarAddGoodApps;
+    ImageView addGoodApps;
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String BAD_APP_LIST = "nameList";
@@ -95,6 +98,8 @@ public class FrontActivity extends AppCompatActivity {
         badApps.clear();
         recyclerViewApps = findViewById(R.id.recycler_view_show_icons);
         recyclerViewAppsGood = findViewById(R.id.recycler_view_show_icons_good);
+        progressBarAddGoodApps = findViewById(R.id.progress_load_good_apps);
+        addGoodApps = findViewById(R.id.add_good_apps);
 
 
 
@@ -327,6 +332,8 @@ public class FrontActivity extends AppCompatActivity {
 
 
     public void goodAdd(View view) {
+        addGoodApps.setVisibility(View.INVISIBLE);
+        progressBarAddGoodApps.setVisibility(View.VISIBLE);
         type = 1;
         Intent badAppsIntent = new Intent(FrontActivity.this, BadAppsActivity.class);
         badAppsIntent.putExtra("type", type);
@@ -502,7 +509,10 @@ public class FrontActivity extends AppCompatActivity {
         // have as many colors as stack-values per entry
         int[] colors = new int[3];
 
-        System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3);
+//        System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3);
+        colors[0] = Color.GREEN;
+        colors[1] = Color.WHITE;
+        colors[2] = Color.RED;
 
         return colors;
     }

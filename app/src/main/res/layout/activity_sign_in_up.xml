@@ -153,6 +153,15 @@
                 android:textStyle="bold"
                 android:textColor="#FFF"
                 />
+            <ProgressBar
+                android:id="@+id/progress_create_new_account"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/divider_facebook_create_new"
+                android:layout_marginTop="12dp"
+                android:layout_centerHorizontal="true"
+                android:visibility="invisible"
+                />
 
 <!--            <Button-->
 <!--                android:id="@+id/phone_login_button"-->
@@ -188,6 +197,15 @@
                 android:background="@drawable/inputsgoogle"
                 android:drawableStart="@drawable/googlenew"
                 />
+            <ProgressBar
+                android:id="@+id/progress_google_sign_in"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/divider_login_google"
+                android:layout_marginTop="12dp"
+                android:layout_centerHorizontal="true"
+                android:visibility="invisible"
+                />
 
             <Button
                 android:id="@+id/facebook_login_button"
@@ -206,6 +224,15 @@
                 android:textColor="@android:color/background_light"
                 android:background="@drawable/inputsfacebbok"
                 android:drawableStart="@drawable/facebooknew"
+                />
+            <ProgressBar
+                android:id="@+id/progress_facebook_sign_in"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/google_login_button"
+                android:layout_marginTop="20dp"
+                android:layout_centerHorizontal="true"
+                android:visibility="invisible"
                 />
 
             <View

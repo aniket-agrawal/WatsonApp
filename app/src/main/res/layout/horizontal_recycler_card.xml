@@ -35,17 +35,29 @@
                 android:id="@+id/text_time_left"
                 android:layout_alignParentEnd="true"
                 android:textColor="@android:color/black"
-                android:textSize="10.8dp"
+                android:textSize="10dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="18dp"
                 android:text=""
                 />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:text="Time Left"
+                android:textStyle="bold"
+                android:textSize="9sp"
+                android:textColor="@android:color/holo_purple"/>
 
-<!--            <com.anychart.AnyChartView-->
-<!--                android:layout_width="55dp"-->
-<!--                android:layout_height="55dp"-->
-<!--                android:id="@+id/pie_time_left"-->
-<!--                />-->
+            <ProgressBar
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:id="@+id/progress_time_left"
+                style="?android:progressBarStyleHorizontal"
+                android:progress="90"
+                android:progressDrawable="@drawable/circle"
+                />
 <!--            android:layout_centerHorizontal="true"-->
 <!--            android:layout_marginBottom="2dp"-->
 <!--            android:layout_below="@id/text_time_left"-->

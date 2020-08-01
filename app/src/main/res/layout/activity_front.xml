@@ -71,6 +71,13 @@
                 android:onClick="goodAdd"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/recycler_view_show_icons"/>
+            <ProgressBar
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/progress_load_good_apps"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/recycler_view_show_icons"
+                android:visibility="invisible"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="wrap_content"
