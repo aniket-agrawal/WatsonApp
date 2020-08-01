@@ -494,6 +494,7 @@ public class FrontActivity extends AppCompatActivity {
                     long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
                     long timeInSec = totalTimeUsageInMillis/1000;
                     total += timeInSec;
+
                 }
             }
         }
