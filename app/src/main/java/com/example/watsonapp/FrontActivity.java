@@ -206,9 +206,10 @@ public class FrontActivity extends AppCompatActivity {
         cal.set(Calendar.HOUR_OF_DAY, 12);
         cal.set(Calendar.MINUTE, 00);
         cal.set(Calendar.SECOND, 00);
-        startMillis = cal.getTimeInMillis();
-        endMillis = startMillis + 3600000;
+        cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR)-6);
         for (int i = 0; i < 7; i++) {
+            startMillis = cal.getTimeInMillis();
+            endMillis = startMillis+3600000;
             float badh = 0, goodh = 0, neutralh = 0;
             List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startMillis, endMillis);
             for (UsageStats usageStats : lUsageStatsMap) {
@@ -224,11 +225,8 @@ public class FrontActivity extends AppCompatActivity {
                     neutralh += (float) ((timeInSec * 1.0) / 3600);
                 }
             }
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(startMillis);
-            barEntries.add(new BarEntry(calendar.get(Calendar.DAY_OF_YEAR), new float[]{goodh, neutralh, badh}));
-            startMillis -= 86400000;
-            endMillis = startMillis + 3600000;
+            barEntries.add(new BarEntry(cal.get(Calendar.DAY_OF_YEAR), new float[]{goodh, neutralh, badh}));
+            cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR)+1);
         }
         BarDataSet barDataSet = new BarDataSet(barEntries,"usage");
         barDataSet.setDrawValues(false);
