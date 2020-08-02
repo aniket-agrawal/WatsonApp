@@ -173,38 +173,48 @@ public class FrontActivity extends AppCompatActivity {
         recyclerViewAppsGood.setLayoutManager(layoutManagerGood);
     }
 
-    BarData usage(String pack) {
-        UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+    @SuppressLint("WrongConstant")
+    BarData usage(String pack, Activity activity, int t) {
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar cal = Calendar.getInstance();
         ArrayList<BarEntry> barEntries = new ArrayList<>();
         cal.set(Calendar.HOUR_OF_DAY, 12);
         cal.set(Calendar.MINUTE, 00);
         cal.set(Calendar.SECOND, 00);
-        for(int i= 17;i < 24;i++){
-            cal.set(Calendar.DAY_OF_MONTH, i);
-            startMillis = cal.getTimeInMillis();
-            endMillis = startMillis+3600000;
+        cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR)-6);
+        for(int i = 0;i < 7;i++){
+            long startMillis = cal.getTimeInMillis();
+            long endMillis = startMillis+3600000;
             List<UsageStats> lUsageStatsMap = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,startMillis, endMillis);
-            //Log.d("Aniket",sdf.format(startMillis));
-            //Log.d("Aniket",sdf.format(endMillis));
+            int a = 0;
             for (UsageStats usageStats : lUsageStatsMap){
-                if(pack.equals(usageStats.getPackageName())){
+                if(pack.equals(usageStats.getPackageName()) && a == 0){
                     long totalTimeUsageInMillis = usageStats.getTotalTimeInForeground();
                     long timeInSec = totalTimeUsageInMillis/1000;
                     float hour = (float) ((timeInSec*1.0)/3600);
                     //Log.d(String.valueOf(i), String.valueOf(hour));
-                    barEntries.add(new BarEntry(i,hour));
+                    a=1;
+                    barEntries.add(new BarEntry(cal.get(Calendar.DAY_OF_YEAR), new float[]{hour}));
                 }
             }
+            cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR)+1);
         }
         BarDataSet barDataSet = new BarDataSet(barEntries,"usage");
-        barData = new BarData();
+        barDataSet.setDrawValues(false);
+        barDataSet.setBarBorderWidth(1.f);
+        if(t == 0) barDataSet.setColors(Color.WHITE);
+        else if(t == 1) barDataSet.setColors(Color.rgb(231, 76, 60));
+        else barDataSet.setColors(Color.rgb(46, 204, 113));
+        BarData barData = new BarData();
         barData.addDataSet(barDataSet);
+        barData.setBarWidth(0.5f);
+        barData.setValueFormatter(new StackedValueFormatter(false, "", 1));
+        barData.setValueTextColor(Color.WHITE);
         return barData;
     }
 
     public void usageAll(BarChart chart) {
-        setGraph(chart);
+        setGraph(chart,0, this);
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar cal = Calendar.getInstance();
         ArrayList<BarEntry> barEntries = new ArrayList<>();
@@ -230,16 +240,17 @@ public class FrontActivity extends AppCompatActivity {
                     neutralh += (float) ((timeInSec * 1.0) / 3600);
                 }
             }
-            barEntries.add(new BarEntry(cal.get(Calendar.DAY_OF_YEAR), new float[]{goodh, neutralh, badh}));
+            barEntries.add(new BarEntry(cal.get(Calendar.DAY_OF_YEAR), new float[]{badh, neutralh, goodh}));
             cal.set(Calendar.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR)+1);
         }
-        BarDataSet barDataSet = new BarDataSet(barEntries,"usage");
+        BarDataSet barDataSet = new BarDataSet(barEntries,"");
         barDataSet.setDrawValues(false);
         barDataSet.setBarBorderWidth(1.f);
         barDataSet.setColors(getColors());
-        barDataSet.setStackLabels(new String[]{"Good", "Neutral", "Bad"});
+        barDataSet.setStackLabels(new String[]{"Bad", "Neutral", "Good"});
         BarData barData = new BarData();
         barData.addDataSet(barDataSet);
+        barData.setBarWidth(0.5f);
         barData.setValueFormatter(new StackedValueFormatter(false, "", 1));
         barData.setValueTextColor(Color.WHITE);
         chart.setData(barData);
@@ -250,7 +261,7 @@ public class FrontActivity extends AppCompatActivity {
         chart.invalidate();
     }
 
-    private void setGraph(BarChart chart) {
+    public void setGraph(BarChart chart, int t, Activity activity) {
         chart.setDrawValueAboveBar(true);
         chart.getDescription().setEnabled(false);
 
@@ -267,14 +278,16 @@ public class FrontActivity extends AppCompatActivity {
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setLabelCount(8, false);
         leftAxis.setDrawGridLines(false);
-        leftAxis.setGranularity(1f);
+        if(t == 0) leftAxis.setGranularity(1f);
+        else leftAxis.setGranularity(0.2f);
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
         leftAxis.setSpaceTop(15f);
         leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setDrawGridLines(false);
-        rightAxis.setGranularity(1f);
+        if(t == 0) rightAxis.setGranularity(1f);
+        else rightAxis.setGranularity(0.2f);
         rightAxis.setLabelCount(8, false);
         rightAxis.setSpaceTop(15f);
         rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
@@ -289,7 +302,7 @@ public class FrontActivity extends AppCompatActivity {
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
 
-        XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
+        XYMarkerView mv = new XYMarkerView(activity, xAxisFormatter,t);
         mv.setChartView(chart);
         chart.setMarker(mv);
 
@@ -399,7 +412,12 @@ public class FrontActivity extends AppCompatActivity {
         });
         appName.setText(pm.getApplicationLabel(applicationInfo));
         BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
-        barEachApp.setData(usage(packagename));
+        setGraph(barEachApp,1,this);
+        barEachApp.setData(usage(packagename,this,0));
+        barEachApp.setFitBars(true);
+        barEachApp.setScaleEnabled(false);
+        barEachApp.animateY(1000);
+        barEachApp.invalidate();
         finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         finalDialog.show();
     }
@@ -432,6 +450,7 @@ public class FrontActivity extends AppCompatActivity {
         initReceivedRecyclerView();
 
         finalDialog.dismiss();
+        usageAll(barChart);
     }
 
 
@@ -510,10 +529,10 @@ public class FrontActivity extends AppCompatActivity {
         // have as many colors as stack-values per entry
         int[] colors = new int[3];
 
-//        System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3);
-        colors[0] = Color.GREEN;
+        System.arraycopy(ColorTemplate.MATERIAL_COLORS, 0, colors, 0, 3);
+        colors[0] = Color.rgb(231, 76, 60);
         colors[1] = Color.WHITE;
-        colors[2] = Color.RED;
+        colors[2] = Color.rgb(46, 204, 113);
 
         return colors;
     }

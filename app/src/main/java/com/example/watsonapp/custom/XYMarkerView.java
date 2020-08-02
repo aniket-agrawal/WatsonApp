@@ -25,12 +25,12 @@ public class XYMarkerView extends MarkerView {
 
     private final TextView tvContent;
     private final ValueFormatter xAxisValueFormatter;
-
+    int t;
     private final DecimalFormat format;
 
-    public XYMarkerView(Context context, ValueFormatter xAxisValueFormatter) {
+    public XYMarkerView(Context context, ValueFormatter xAxisValueFormatter, int t) {
         super(context, R.layout.custom_marker_view);
-
+        this.t = t;
         this.xAxisValueFormatter = xAxisValueFormatter;
         tvContent = findViewById(R.id.tvContent);
         format = new DecimalFormat("###.0");
@@ -41,24 +41,23 @@ public class XYMarkerView extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
 
-        BarEntry be = (BarEntry) e;
-        int i = highlight.getStackIndex();
-        String s;
-        if (i==0){
-            s = "Good Apps- ";
+        if(t == 0) {
+            BarEntry be = (BarEntry) e;
+            int i = highlight.getStackIndex();
+            String s;
+            if (i == 0) {
+                s = "Bad Apps- ";
+            } else if (i == 1) {
+                s = "Neutral Apps- ";
+            } else {
+                s = "Good Apps- ";
+            }
+
+            tvContent.setText(String.format(s + "%s hr", format.format(be.getYVals()[highlight.getStackIndex()])));
         }
-        else if(i==1){
-            s = "Neutral Apps- ";
+        else if(t == 1){
+            tvContent.setText(String.format("%s hr", format.format(e.getY())));
         }
-        else {
-            s = "Bad Apps- ";
-        }
-
-        Log.d("Abcdef",String.valueOf(be.getYVals()[1]));
-
-
-        tvContent.setText(String.format(s+"%s hr",format.format(be.getYVals()[highlight.getStackIndex()])));
-
         super.refreshContent(e, highlight);
     }
 
