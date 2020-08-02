@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser user;
     private ImageButton pickDob;
     DatePickerDialog.OnDateSetListener mDateSetListener;
+    ProgressBar progressBarSubmitDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         dob = findViewById(R.id.dob_info_signup);
         submitButton = findViewById(R.id.submit_details_button);
         pickDob = findViewById(R.id.dob_user_signup);
+        progressBarSubmitDetails = findViewById(R.id.progress_submit_details);
 
 
         pickDob.setOnClickListener(new View.OnClickListener() {
@@ -120,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                submitButton.setVisibility(View.INVISIBLE);
+                progressBarSubmitDetails.setVisibility(View.VISIBLE);
                 fullNameString = fullName.getText().toString();
                 phoneNumberString = phoneNum.getText().toString();
 

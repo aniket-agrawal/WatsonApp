@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -109,8 +111,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         CircleImageView imageIcon;
         TextView nameApp,pname,timeLeft;
-        PieChart pieChart;
-        AnyChartView anyChartView;
+        ProgressBar progressBar;
+        ImageView imageTimeLeft;
+//        PieChart pieChart;
+//        AnyChartView anyChartView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -125,6 +129,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }
             });
             timeLeft = itemView.findViewById(R.id.text_time_left);
+            progressBar = itemView.findViewById(R.id.progress_time_left);
+            imageTimeLeft = itemView.findViewById(R.id.image_time_left);
         }
 
         @SuppressLint("SetTextI18n")
@@ -139,7 +145,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             pname.setVisibility(View.INVISIBLE);
             if (type == 0){
                 timeLeft.setText(app.hour+"h"+":"+app.min+"m");
+
             }
+            if(app.hour == 0 && app.min == 0){
+                imageTimeLeft.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+
+            progressBar.setProgress(50);
 
 //            pieChart.setUsePercentValues(true);
 //            pieChart.getDescription().setEnabled(false);
