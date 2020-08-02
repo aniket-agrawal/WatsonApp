@@ -51,6 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -110,7 +111,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         CircleImageView imageIcon;
-        TextView nameApp,pname,timeLeft;
+        TextView nameApp,pname,timeLeft,tl;
         ProgressBar progressBar;
         ImageView imageTimeLeft;
 //        PieChart pieChart;
@@ -121,6 +122,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             imageIcon = itemView.findViewById(R.id.icon_image_card);
             nameApp = itemView.findViewById(R.id.card_app_name);
             pname = itemView.findViewById(R.id.card_app_package_name);
+            tl = itemView.findViewById(R.id.tl);
 //            anyChartView = itemView.findViewById(R.id.pie_time_left);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -150,9 +152,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             if(app.hour == 0 && app.min == 0){
                 imageTimeLeft.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.INVISIBLE);
+                tl.setVisibility(View.INVISIBLE);
             }
 
-            progressBar.setProgress(50);
+            Random random = new Random();
+            int a = random.nextInt(50)+50;
+
+            progressBar.setProgress(a);
 
 //            pieChart.setUsePercentValues(true);
 //            pieChart.getDescription().setEnabled(false);
@@ -215,7 +221,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         });
         appName.setText(activity.getPackageManager().getApplicationLabel(applicationInfo));
         BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
-        barEachApp.setData(usage(packagename));
+        FrontActivity frontActivity = new FrontActivity();
+        frontActivity.setGraph(barEachApp,1,activity);
+        barEachApp.setData(frontActivity.usage(packagename,activity,type+1));
+        barEachApp.setFitBars(true);
+        barEachApp.setScaleEnabled(false);
+        barEachApp.animateY(1000);
+        barEachApp.invalidate();
         finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         finalDialog.show();
     }

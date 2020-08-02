@@ -50,7 +50,7 @@
         android:orientation="horizontal"
         android:layout_below="@+id/add_bad_apps"
         android:layout_marginBottom="10dp"
-        android:background="@android:color/holo_red_light">
+        android:background="@drawable/bad_apps_boundary">
     </androidx.recyclerview.widget.RecyclerView>
 
     <TextView
@@ -86,7 +86,7 @@
         android:orientation="horizontal"
         android:layout_below="@+id/add_good_apps"
         android:layout_marginBottom="10dp"
-        android:background="@android:color/holo_green_light">
+        android:background="@drawable/buttons">
 
     </androidx.recyclerview.widget.RecyclerView>
         </RelativeLayout>

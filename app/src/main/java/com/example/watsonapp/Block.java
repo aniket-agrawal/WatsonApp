@@ -58,14 +58,14 @@ public class Block extends AppCompatActivity {
         } else {
             v.vibrate(2000);
         }
-        prefInt = sharedPreferences.getInt(INTEGER_PREF, 0);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        int next = prefInt + 1;
-        next = next % tempListBlock.size();
-        editor.putInt(INTEGER_PREF, next);
-        editor.apply();
         try {
+            prefInt = sharedPreferences.getInt(INTEGER_PREF, 0);
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            int next = prefInt + 1;
+            next = next % tempListBlock.size();
+            editor.putInt(INTEGER_PREF, next);
+            editor.apply();
             app = tempListBlock.get(prefInt);
             new Handler().postDelayed(new Runnable() {
                 @Override

@@ -214,13 +214,19 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         }
         appName.setText(activity.getPackageManager().getApplicationLabel(applicationInfo));
         BarChart barEachApp = finalDialog.findViewById(R.id.graph_usage_per_app);
-        barEachApp.setData(usage(packagename));
+        FrontActivity frontActivity = new FrontActivity();
+        frontActivity.setGraph(barEachApp,1,activity);
+        barEachApp.setData(frontActivity.usage(packagename,activity,0));
+        barEachApp.setFitBars(true);
+        barEachApp.setScaleEnabled(false);
+        barEachApp.animateY(1000);
+        barEachApp.invalidate();
         finalDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         finalDialog.show();
     }
 
 
-    private BarData usage(String packagename) {
+    /*private BarData usage(String packagename) {
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) activity.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar cal = Calendar.getInstance();
         ArrayList<BarEntry> barEntries = new ArrayList<>();
@@ -246,7 +252,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
         barData = new BarData();
         barData.addDataSet(barDataSet);
         return barData;
-    }
+    }*/
 
     private void addBadApps(String pname, int hour, int min) {
         SharedPreferences sharedPreferences = activity.getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
