@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -18,6 +19,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.util.Pair;
+
+import com.example.watsonapp.custom.AppItem;
+import com.example.watsonapp.custom.DataManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,16 +50,17 @@ public class ShowUsage extends AppCompatActivity {
     long endMillis;
     Map<String, UsageStats> lUsageStatsMap;
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_usage);
         pm = getPackageManager();
-        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+        //List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
         activity = this;
         apps.clear();
         recyclerView = (RecyclerView)findViewById(R.id.usage);
-        calendar = Calendar.getInstance();
+        /*calendar = Calendar.getInstance();
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 11);
         cal.set(Calendar.MINUTE, 00);
@@ -79,6 +84,20 @@ public class ShowUsage extends AppCompatActivity {
             } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
             } else {
                 addApps(app);
+            }
+        }*/
+        DataManager dataManager = new DataManager();
+        List<AppItem> items = dataManager.getApps(activity);
+        for (AppItem item : items){
+            long totalTimeUsageInMillis = item.mUsageTime;
+            long timeInSec = totalTimeUsageInMillis/1000;
+            if(timeInSec!=0){
+                try {
+                    ApplicationInfo a = pm.getApplicationInfo(item.mPackageName,PackageManager.MATCH_ALL);
+                    apps.add(new Apps(timeInSec, (String) a.loadLabel(pm),a.loadIcon(pm)));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
         Collections.sort(apps, Apps.appTime);
