@@ -90,7 +90,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListViewHolder
             Drawable icon = app.appIcon;
             long hour = timeInSec / 3600;
             long min = (timeInSec - (hour * 3600)) / 60;
-            String usage = hour + " hr, " + min + " min";
+            long sec = timeInSec - (hour * 3600) - (min * 60);
+            String usage = hour + " hr, " + min + " min, " + sec + " sec";
             appUsage.setText(usage);
             appIcon.setImageDrawable(icon);
             appName.setText(name);
