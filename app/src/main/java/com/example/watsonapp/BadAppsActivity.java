@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -16,8 +17,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.watsonapp.FrontActivity.BAD_APP_LIST;
+import static com.example.watsonapp.FrontActivity.GOOD_APP_LIST;
+import static com.example.watsonapp.FrontActivity.SHARED_PREFS;
+import static com.example.watsonapp.FrontActivity.USAGE_HOUR;
 
 public class BadAppsActivity extends AppCompatActivity {
 
@@ -28,6 +38,8 @@ public class BadAppsActivity extends AppCompatActivity {
     Activity activity;
     RecyclerBadAppsAdapter listAdapter;
     int type;
+    ArrayList<String> tempList;
+    ArrayList<String> tempListGood;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +54,35 @@ public class BadAppsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         type = intent.getIntExtra("type", 0);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        Gson gson = new Gson();
+
+
+        String json = sharedPreferences.getString(BAD_APP_LIST, null);
+        String json1 = sharedPreferences.getString(GOOD_APP_LIST, null);
+        Type typer = new TypeToken<ArrayList<String>>() {}.getType();
+        tempList = gson.fromJson(json, typer);
+        tempListGood = gson.fromJson(json1, typer);
+
+        if(tempList == null) {
+            tempList = new ArrayList<String>();
+            tempList.clear();
+        }
+
+        if(tempListGood == null){
+            tempListGood = new ArrayList<String>();
+            tempListGood.clear();
+        }
 
         for(ApplicationInfo app : packages) {
-            if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
-                addApps(app);
-            } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-            } else {
-                addApps(app);
+            String packageName = app.packageName;
+            if((!tempList.contains(packageName)) && (!tempListGood.contains(packageName))) {
+                if ((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
+                    addApps(app);
+                } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+                } else {
+                    addApps(app);
+                }
             }
         }
         initReceivedRecyclerView();
