@@ -3,6 +3,7 @@ package com.example.watsonapp;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,6 +11,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AppOpsManager;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
@@ -25,9 +27,12 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.watsonapp.custom.DayAxisValueFormatter;
@@ -52,7 +57,7 @@ import java.util.List;
 
 import static android.content.pm.PackageManager.MATCH_ALL;
 
-public class FrontActivity extends AppCompatActivity {
+public class FrontActivity extends AppCompatActivity{
 
     private final static String TAG = "Soumil";
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 1;
@@ -69,6 +74,10 @@ public class FrontActivity extends AppCompatActivity {
     long endMillis;
     BarChart barChart;
     Dialog myDialog,finalDialog;
+//    ImageButton timeSetter;
+    TextView timeLimitText;
+
+    NumberPicker hourPick, minPick, percentPick;
     String packagename;
     BarData barData;
     int type;
@@ -394,8 +403,63 @@ public class FrontActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        final EditText hour = finalDialog.findViewById(R.id.hour);
-        final EditText min = finalDialog.findViewById(R.id.min);
+
+//        timeSetter = finalDialog.findViewById(R.id.time_limit_setter);
+        timeLimitText = finalDialog.findViewById(R.id.time_limit_text);
+        hourPick = finalDialog.findViewById(R.id.hour_pick);
+        minPick = finalDialog.findViewById(R.id.minute_pick);
+        percentPick = finalDialog.findViewById(R.id.time_limit_percent);
+
+        hourPick.setMinValue(0);
+        hourPick.setMaxValue(23);
+        minPick.setMinValue(0);
+        minPick.setMaxValue(59);
+        percentPick.setMinValue(0);
+        percentPick.setMaxValue(100);
+
+        final int[] hour = new int[1];
+        final int[] min = new int[1];
+        final int[] percent = new int[1];
+        hour[0] = 0;
+        min[0] = 0;
+        percent[0] = 0;
+
+        hourPick.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                hour[0] = newVal;
+                timeLimitText.setText(hour[0]+"h:" + min[0]+"m");
+            }
+        });
+
+        minPick.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                min[0] = newVal;
+                timeLimitText.setText(hour[0]+"h:" + min[0]+"m");
+
+            }
+        });
+
+        percentPick.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                percent[0] = newVal;
+
+            }
+        });
+
+
+//        timeSetter.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                DialogFragment timePicker = new TimePickerFragment();
+//                timePicker.show(getSupportFragmentManager(), "time picker");
+//            }
+//        });
+//        final EditText hour = finalDialog.findViewById(R.id.hour);
+//        final EditText min = finalDialog.findViewById(R.id.min);
+
         Button add = finalDialog.findViewById(R.id.add);
         final TextView avgWeek = finalDialog.findViewById(R.id.avg_week);
         final TextView prevDay = finalDialog.findViewById(R.id.previous_day);
@@ -404,7 +468,7 @@ public class FrontActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    addBadApps(packagename,Integer.parseInt(hour.getText().toString()),Integer.parseInt(min.getText().toString()));
+                    addBadApps(packagename,hour[0],min[0]);
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -422,6 +486,10 @@ public class FrontActivity extends AppCompatActivity {
         finalDialog.show();
     }
 
+//    @Override
+//    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+//        timeLimitText.setText(hourOfDay +"hr" + minute + "min");
+//    }
 
     private void addBadApps(String pname, int hour, int min) throws PackageManager.NameNotFoundException {
         PackageManager pm = getPackageManager();

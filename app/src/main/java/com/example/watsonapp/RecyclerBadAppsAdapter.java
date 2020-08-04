@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +67,9 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
     ArrayList<String> tempList;
     ArrayList<Integer> hourList,minList;
     int type;
+    TextView timeLimitText;
+
+    NumberPicker hourPick, minPick, percentPick;
 
     public RecyclerBadAppsAdapter(Activity activity, ArrayList<Apps> apps, int type) {
         this.activity = activity;
@@ -190,8 +194,50 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
             e.printStackTrace();
         }
         if(type==0) {
-            final TextView hour = finalDialog.findViewById(R.id.hour);
-            final TextView min = finalDialog.findViewById(R.id.min);
+            timeLimitText = finalDialog.findViewById(R.id.time_limit_text);
+            hourPick = finalDialog.findViewById(R.id.hour_pick);
+            minPick = finalDialog.findViewById(R.id.minute_pick);
+            percentPick = finalDialog.findViewById(R.id.time_limit_percent);
+
+            hourPick.setMinValue(0);
+            hourPick.setMaxValue(23);
+            minPick.setMinValue(0);
+            minPick.setMaxValue(59);
+            percentPick.setMinValue(0);
+            percentPick.setMaxValue(100);
+
+            final int[] hour = new int[1];
+            final int[] min = new int[1];
+            final int[] percent = new int[1];
+            hour[0] = 0;
+            min[0] = 0;
+            percent[0] = 0;
+
+            hourPick.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                @Override
+                public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                    hour[0] = newVal;
+                    timeLimitText.setText(hour[0]+"h:" + min[0]+"m");
+                }
+            });
+
+            minPick.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                @Override
+                public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                    min[0] = newVal;
+                    timeLimitText.setText(hour[0]+"h:" + min[0]+"m");
+
+                }
+            });
+
+            percentPick.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                @Override
+                public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                    percent[0] = newVal;
+
+                }
+            });
+
             final TextView avgWeek = finalDialog.findViewById(R.id.avg_week);
             final TextView prevDay = finalDialog.findViewById(R.id.previous_day);
             setUsage(packagename,avgWeek,prevDay);
@@ -199,7 +245,7 @@ public class RecyclerBadAppsAdapter extends RecyclerView.Adapter<RecyclerBadApps
             add.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    addBadApps(packagename, Integer.parseInt(hour.getText().toString()), Integer.parseInt(min.getText().toString()));
+                    addBadApps(packagename,hour[0],min[0]);
                 }
             });
         }
