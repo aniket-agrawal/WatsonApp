@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +74,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     BarData barData;
     int type;
     ArrayList<String> tempList;
+
 
     public RecyclerAdapter(Activity activity, ArrayList<Apps> apps,int type) {
         this.activity = activity;
