@@ -151,7 +151,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 timeLeft.setText(app.hour+"h"+":"+app.min+"m");
 
             }
-            if(app.hour == 0 && app.min == 0){
+            if (type == 1){
                 imageTimeLeft.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.INVISIBLE);
                 tl.setVisibility(View.INVISIBLE);
