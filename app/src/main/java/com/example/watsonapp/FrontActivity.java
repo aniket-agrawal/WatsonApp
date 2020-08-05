@@ -89,6 +89,7 @@ public class FrontActivity extends AppCompatActivity{
     public static final String GOOD_APP_LIST = "nameListGood";
     public static final String USAGE_HOUR = "hour";
     public static final String USAGE_MIN = "min";
+    TextView percentLimitText;
 
 
     @SuppressLint("WrongConstant")
@@ -406,9 +407,15 @@ public class FrontActivity extends AppCompatActivity{
 
 //        timeSetter = finalDialog.findViewById(R.id.time_limit_setter);
         timeLimitText = finalDialog.findViewById(R.id.time_limit_text);
+        percentLimitText = finalDialog.findViewById(R.id.percent_limit_text);
         hourPick = finalDialog.findViewById(R.id.hour_pick);
         minPick = finalDialog.findViewById(R.id.minute_pick);
         percentPick = finalDialog.findViewById(R.id.time_limit_percent);
+
+
+        final TextView avgWeek = finalDialog.findViewById(R.id.avg_week);
+        final TextView prevDay = finalDialog.findViewById(R.id.previous_day);
+        final long timeavg = setUsage(packagename,avgWeek,prevDay);
 
         hourPick.setMinValue(0);
         hourPick.setMaxValue(23);
@@ -429,6 +436,11 @@ public class FrontActivity extends AppCompatActivity{
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 hour[0] = newVal;
                 timeLimitText.setText(hour[0]+"h:" + min[0]+"m");
+                long time = (hour[0]*3600) + (min[0]*60);
+                int per = (int) (time*100/timeavg);
+                percent[0] = per;
+                percentPick.setValue(per);
+                percentLimitText.setText(percent[0]+"%");
             }
         });
 
@@ -437,7 +449,11 @@ public class FrontActivity extends AppCompatActivity{
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 min[0] = newVal;
                 timeLimitText.setText(hour[0]+"h:" + min[0]+"m");
-
+                long time = (hour[0]*3600) + (min[0]*60);
+                int per = (int) (time*100/timeavg);
+                percent[0] = per;
+                percentPick.setValue(per);
+                percentLimitText.setText(percent[0]+"%");
             }
         });
 
@@ -445,7 +461,15 @@ public class FrontActivity extends AppCompatActivity{
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 percent[0] = newVal;
-
+                long time = (percent[0]*timeavg/100);
+                long hou = time/3600;
+                long mi = (time - (hou * 3600)) / 60;
+                hourPick.setValue((int) hou);
+                minPick.setValue((int) mi);
+                hour[0]= (int) hou;
+                min[0]= (int) mi;
+                timeLimitText.setText(hour[0]+"h:" + min[0]+"m");
+                percentLimitText.setText(percent[0]+"%");
             }
         });
 
@@ -461,9 +485,6 @@ public class FrontActivity extends AppCompatActivity{
 //        final EditText min = finalDialog.findViewById(R.id.min);
 
         Button add = finalDialog.findViewById(R.id.add);
-        final TextView avgWeek = finalDialog.findViewById(R.id.avg_week);
-        final TextView prevDay = finalDialog.findViewById(R.id.previous_day);
-        setUsage(packagename,avgWeek,prevDay);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -551,7 +572,7 @@ public class FrontActivity extends AppCompatActivity{
         }
     }
 
-    private void setUsage(String pack, TextView avgWeek, TextView prevDay) {
+    private long setUsage(String pack, TextView avgWeek, TextView prevDay) {
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 12);
@@ -590,6 +611,7 @@ public class FrontActivity extends AppCompatActivity{
         long min = (total - (hour * 3600)) / 60;
         String avg = hour+" hr "+min+" min";
         avgWeek.setText(avg);
+        return total;
     }
 
     private int[] getColors() {
