@@ -2,6 +2,7 @@ package com.example.watsonapp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,6 +24,7 @@ import android.util.Pair;
 
 import com.example.watsonapp.custom.AppItem;
 import com.example.watsonapp.custom.DataManager;
+import com.example.watsonapp.custom.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -40,6 +44,7 @@ public class ShowUsage extends AppCompatActivity {
     private final static String TAG = "Aniket";
     PackageManager pm;
     ArrayList<Apps> apps = new ArrayList<Apps>();
+    ArrayList<HashMap> topAppsList = new ArrayList<>();
     RecyclerView recyclerView;
     Activity activity;
     String myDate = "";
@@ -62,13 +67,14 @@ public class ShowUsage extends AppCompatActivity {
         recyclerView = (RecyclerView)findViewById(R.id.usage);
         /*calendar = Calendar.getInstance();
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY, 11);
+        cal.set(Calendar.HOUR_OF_DAY, 00);
         cal.set(Calendar.MINUTE, 00);
         cal.set(Calendar.SECOND, 00);
+        cal.set(Calendar.MILLISECOND,00);
         long t = 86400000;
         t = t*1;
         startMillis = cal.getTimeInMillis();
-        endMillis = cal.getTimeInMillis()+3600000;
+        endMillis = System.currentTimeMillis();
         myDate = sdf.format(startMillis);
         myDate1 = sdf.format(endMillis);
         Log.d("Aniket",myDate1);
@@ -85,7 +91,7 @@ public class ShowUsage extends AppCompatActivity {
             } else {
                 addApps(app);
             }
-        }*/
+        }
         DataManager dataManager = new DataManager();
         List<AppItem> items = dataManager.getApps(activity);
         for (AppItem item : items){
@@ -99,6 +105,24 @@ public class ShowUsage extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+        }*/
+        DataUtils dataUtils = new DataUtils(this);
+        dataUtils.refreshDatabase();
+        topAppsList = dataUtils.getTopApps();
+        for (HashMap<String, Long> hm : topAppsList){
+            HashMap.Entry<String, Long> entry = hm.entrySet().iterator().next();
+            long usageTime = entry.getValue();
+            String packageName = entry.getKey();
+            PackageManager pm = getPackageManager();
+            ApplicationInfo app;
+
+            try {
+                app = pm.getApplicationInfo(packageName, 0);
+            } catch (final PackageManager.NameNotFoundException e) {
+                app = null;
+            }
+            apps.add(new Apps(usageTime/1000,app.loadLabel(pm).toString(), app.loadIcon(pm)));
+
         }
         Collections.sort(apps, Apps.appTime);
         initReceivedRecyclerView();

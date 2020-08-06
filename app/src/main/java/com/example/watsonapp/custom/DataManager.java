@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class DataManager {
 
@@ -40,10 +42,27 @@ public class DataManager {
             cal.set(Calendar.MILLISECOND, 0);
             range[0] = cal.getTimeInMillis();
             range[1] = System.currentTimeMillis();
-            UsageEvents events = manager.queryEvents(range[0], range[1]);
-            UsageEvents.Event event = new UsageEvents.Event();
-            while (events.hasNextEvent()) {
-                events.getNextEvent(event);
+            long next_extract_time = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
+            UsageEvents usageEvents = manager.queryEvents(range[0], range[1]);
+            /*while (usageEvents.hasNextEvent()) {
+                UsageEvents.Event event = new UsageEvents.Event();
+                usageEvents.getNextEvent(event);
+                String packageName = event.getPackageName();
+                int actionType = event.getEventType();
+                long eventTime = event.getTimeStamp();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(eventTime);
+
+                PackageManager pm = activity.getPackageManager();
+                if (pm.getLaunchIntentForPackage(packageName) != null
+                        & ((actionType == 1 & usageEvents.hasNextEvent()) || actionType == 2)
+                        & eventTime > next_extract_time) {
+
+                }
+            }*/
+            while (usageEvents.hasNextEvent()) {
+                UsageEvents.Event event = new UsageEvents.Event();
+                usageEvents.getNextEvent(event);
                 int eventType = event.getEventType();
                 long eventTime = event.getTimeStamp();
                 String eventPackage = event.getPackageName();
@@ -72,7 +91,7 @@ public class DataManager {
                             listItem.mEventTime = lastEndEvent.timeStamp;
                             long duration = lastEndEvent.timeStamp - startPoints.get(prevPackage);
                             if (duration <= 0) duration = 0;
-                            listItem.mUsageTime += duration;
+                            listItem.mUsageTime += duration+1000;
                             if (duration > 5000) {
                                 listItem.mCount++;
                             }
