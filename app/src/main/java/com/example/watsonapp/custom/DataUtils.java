@@ -29,70 +29,7 @@ public class DataUtils {
         usageStatsManager = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
     }
 
-    void saveSettings(boolean showNag, int hourLimit, int minuteLimit) {
-        Long usageLimit = TimeUnit.HOURS.toMillis(hourLimit)
-                + TimeUnit.MINUTES.toMillis(minuteLimit);
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(AppTimerContract.AppTimerSettings.COLUMN_NAME_SHOW_NAG, showNag);
-        contentValues.put(AppTimerContract.AppTimerSettings.COLUMN_NAME_TARGET_USAGE_TIME, usageLimit);
-        db = dbHelper.getWritableDatabase();
 
-        db.update(
-                AppTimerContract.AppTimerSettings.TABLE_NAME,
-                contentValues,
-                null, null
-        );
-    }
-
-    void saveFloaterPosition(int x, int y) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(AppTimerContract.AppTimerSettings.COLUMN_NAME_FLOATER_POSITION_X, x);
-        contentValues.put(AppTimerContract.AppTimerSettings.COLUMN_NAME_FLOATER_POSITION_Y, y);
-        db = dbHelper.getWritableDatabase();
-
-        db.update(
-                AppTimerContract.AppTimerSettings.TABLE_NAME,
-                contentValues,
-                null, null
-        );
-    }
-
-    HashMap getSettings() {
-        int hours, minutes, nag, floaterXPosition, floaterYPosition;
-        HashMap<String, Integer> h = new HashMap<>();
-
-        String[] projection = new String[] {
-                BaseColumns._ID,
-                AppTimerContract.AppTimerSettings.COLUMN_NAME_SHOW_NAG,
-                AppTimerContract.AppTimerSettings.COLUMN_NAME_TARGET_USAGE_TIME,
-                AppTimerContract.AppTimerSettings.COLUMN_NAME_FLOATER_POSITION_X,
-                AppTimerContract.AppTimerSettings.COLUMN_NAME_FLOATER_POSITION_Y
-        };
-        db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.query(
-                AppTimerContract.AppTimerSettings.TABLE_NAME,
-                projection,
-                null, null, null, null, null
-        );
-        if (cursor.moveToFirst()) {
-            long limit = cursor.getInt(cursor.getColumnIndexOrThrow(AppTimerContract.AppTimerSettings.COLUMN_NAME_TARGET_USAGE_TIME));
-            hours = (int) TimeUnit.MILLISECONDS.toHours(limit);
-            minutes = (int) TimeUnit.MILLISECONDS.toMinutes(limit - TimeUnit.HOURS.toMillis(hours));
-            nag = cursor.getInt(cursor.getColumnIndexOrThrow(AppTimerContract.AppTimerSettings.COLUMN_NAME_SHOW_NAG));
-            floaterXPosition = cursor.getInt(cursor.getColumnIndexOrThrow(AppTimerContract.AppTimerSettings.COLUMN_NAME_FLOATER_POSITION_X));
-            floaterYPosition = cursor.getInt(cursor.getColumnIndexOrThrow(AppTimerContract.AppTimerSettings.COLUMN_NAME_FLOATER_POSITION_Y));
-            h.put("hours", hours);
-            h.put("minutes", minutes);
-            h.put("nag", nag);
-            h.put("floaterXPosition", floaterXPosition);
-            h.put("floaterYPosition", floaterYPosition);
-            cursor.close();
-            return h;
-        } else {
-            cursor.close();
-            return null;
-        }
-    }
 
     public void refreshDatabase() {
         String[] projection = new String[] {
