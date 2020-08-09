@@ -21,6 +21,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -80,9 +82,11 @@ public class FrontActivity extends AppCompatActivity{
     NumberPicker hourPick, minPick, percentPick;
     String packagename;
     BarData barData;
-    int type;
+    int type, dataOfDays = 1;
     ProgressBar progressBarAddGoodApps;
     ImageView addGoodApps;
+    Button oneDayButton, weekButton;
+    TextView totalGoodTime, totalBadTime, totalUsage;
 
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String BAD_APP_LIST = "nameList";
@@ -90,6 +94,8 @@ public class FrontActivity extends AppCompatActivity{
     public static final String USAGE_HOUR = "hour";
     public static final String USAGE_MIN = "min";
     TextView percentLimitText;
+
+    GradientDrawable greenButton, redButton;
 
 
     @SuppressLint("WrongConstant")
@@ -110,6 +116,44 @@ public class FrontActivity extends AppCompatActivity{
         recyclerViewAppsGood = findViewById(R.id.recycler_view_show_icons_good);
         progressBarAddGoodApps = findViewById(R.id.progress_load_good_apps);
         addGoodApps = findViewById(R.id.add_good_apps);
+        oneDayButton = findViewById(R.id.one_day_button);
+        weekButton = findViewById(R.id.week_button);
+        totalBadTime = findViewById(R.id.total_bad_time);
+        totalGoodTime = findViewById(R.id.total_good_time);
+        totalUsage = findViewById(R.id.total_usage);
+        greenButton = (GradientDrawable) oneDayButton.getBackground().mutate();
+        redButton = (GradientDrawable) weekButton.getBackground().mutate();
+
+
+
+
+        oneDayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                weekButton.setEnabled(true);
+                oneDayButton.setEnabled(false);
+//                oneDayButton.setBackgroundColor(Color.GREEN);
+//                weekButton.setBackgroundColor(Color.RED);
+                oneDayButton.setBackground(greenButton);
+                weekButton.setBackground(redButton);
+                dataOfDays = 1;
+
+            }
+        });
+
+        weekButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                oneDayButton.setEnabled(true);
+                weekButton.setEnabled(false);
+                oneDayButton.setBackground(redButton);
+                weekButton.setBackground(greenButton);
+//                weekButton.setBackgroundColor(Color.GREEN);
+//                oneDayButton.setBackgroundColor(Color.RED);
+                dataOfDays = 7;
+            }
+        });
+
 
 
 

@@ -15,13 +15,53 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:id="@+id/linear_layout"
+                >
+                <Button
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/one_day_button"
+                    android:background="@drawable/buttons"
+                    android:text="One Day"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="11dp"/>
+                <Button
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/week_button"
+                    android:textStyle="bold"
+                    android:background="@drawable/buttonsred"
+                    android:text="One Week"
+                    android:textAllCaps="false"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="11dp"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Total Usage is _________"
+                android:id="@+id/total_usage"
+                android:layout_below="@+id/linear_layout"
+                android:textStyle="bold"
+                android:gravity="center_horizontal"
+                android:textSize="20sp"/>
+
     <com.github.mikephil.charting.charts.BarChart
+        android:layout_below="@+id/total_usage"
         android:layout_width="match_parent"
         android:layout_height="420dp"
         android:id="@+id/graph_usage"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"/>
 
             <ImageView
@@ -43,12 +83,23 @@
         android:layout_below="@+id/graph_usage"
         android:textStyle="bold"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/total_bad_time"
+                android:layout_marginTop="5dp"
+                android:text="Total Bad Time"
+                android:layout_below="@+id/text_bad_apps"
+                android:background="@drawable/buttonsred"
+                android:textStyle="bold"
+                android:layout_marginBottom="5dp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/recycler_view_show_icons"
         android:orientation="horizontal"
-        android:layout_below="@+id/add_bad_apps"
+        android:layout_below="@+id/total_bad_time"
         android:layout_marginBottom="10dp"
         android:background="@drawable/bad_apps_boundary">
     </androidx.recyclerview.widget.RecyclerView>
@@ -63,6 +114,16 @@
         android:layout_marginTop="5dp"
         android:layout_below="@+id/recycler_view_show_icons"
         android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/total_good_time"
+                android:layout_marginTop="5dp"
+                android:text="Total Good Time"
+                android:layout_below="@+id/text_good_apps"
+                android:background="@drawable/buttons"
+                android:textStyle="bold"
+                android:layout_marginBottom="5dp"/>
             <ImageView
                 android:id="@+id/add_good_apps"
                 android:layout_width="wrap_content"
@@ -84,7 +145,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/recycler_view_show_icons_good"
         android:orientation="horizontal"
-        android:layout_below="@+id/add_good_apps"
+        android:layout_below="@+id/total_good_time"
         android:layout_marginBottom="10dp"
         android:background="@drawable/buttons">
 
